@@ -7,13 +7,11 @@
 
 > ***[For 'feedback' [#78](https://github.com/myissuses)]***
 
-Use the command Create Snippet from the command palette or your custom keybind:
-
 
 **Create your cusstom command .**
 
 
-![PowerTerminal](https://github.com/mygif)
+![PowerTerminal](https://github.com/sayehxp/power-terminal/images/createcommand.gif)
 
 
 

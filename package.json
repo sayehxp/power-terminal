@@ -1,0 +1,151 @@
+{
+	"name": "PowerTerminal",
+	"displayName": "Power Terminal",
+	"description": "Create your custtom Commands and run them with one in Terminal",
+	"version": "1.0.0",
+	"publisher": "Ahmed_Elsayeh",
+	"author": {
+		"name": "sayehxp",
+		"email": "sayehxp@gmail.com"
+	},
+  
+  "engines": {
+    "vscode": "^1.0.0"
+  },
+  "main": "./extension.js",
+  "activationEvents": [
+    "onCommand:extension.createnew",
+    "onCommand:extension.execute",
+    "onCommand:extension.catcharg",
+    "onCommand:extension.sync"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.sync",
+        "title": "Sync All",
+        "category": "Power Terminal"
+      },
+      {
+        "command": "extension.createnew",
+        "title": "Create Command",
+        "category": "Power Terminal"
+      },
+      {
+        "command": "extension.execute",
+        "title": "Run Command",
+        "category": "Power Terminal"
+      },
+      {
+        "command": "extension.catcharg"
+      }
+    ],
+    "keybindings": [
+      {
+        "key": "ctrl+shift+alt+99",
+        "command": "extension.sync"
+      },
+      {
+        "key": "ctrl+shift+alt+1",
+        "command": "extension.catcharg",
+        "args": "1"
+      },
+      {
+        "key": "ctrl+shift+alt+2",
+        "command": "extension.catcharg",
+        "args": "2"
+      },
+      {
+        "key": "ctrl+shift+alt+3",
+        "command": "extension.catcharg",
+        "args": "3"
+      },
+      {
+        "key": "ctrl+shift+alt+4",
+        "command": "extension.catcharg",
+        "args": "4"
+      },
+      {
+        "key": "ctrl+shift+alt+5",
+        "command": "extension.catcharg",
+        "args": "5"
+      },
+      {
+        "key": "ctrl+shift+alt+6",
+        "command": "extension.catcharg",
+        "args": "6"
+      },
+      {
+        "key": "ctrl+shift+alt+7",
+        "command": "extension.catcharg",
+        "args": "7"
+      },
+      {
+        "key": "ctrl+shift+alt+8",
+        "command": "extension.catcharg",
+        "args": "8"
+      },
+      {
+        "key": "ctrl+shift+alt+9",
+        "command": "extension.catcharg",
+        "args": "9"
+      },
+      {
+        "key": "ctrl+shift+alt+10",
+        "command": "extension.catcharg",
+        "args": "10"
+      },
+      {
+        "key": "ctrl+shift+alt+11",
+        "command": "extension.catcharg",
+        "args": "11"
+      },
+      {
+        "key": "ctrl+shift+alt+12",
+        "command": "extension.catcharg",
+        "args": "12"
+      },
+      {
+        "key": "ctrl+shift+alt+13",
+        "command": "extension.catcharg",
+        "args": "13"
+      },
+      {
+        "key": "ctrl+shift+alt+14",
+        "command": "extension.catcharg",
+        "args": "14"
+      },
+      {
+        "key": "ctrl+shift+alt+15",
+        "command": "extension.catcharg",
+        "args": "15"
+      },
+      {
+        "key": "ctrl+shift+alt+16",
+        "command": "extension.catcharg",
+        "args": "16"
+      },
+      {
+        "key": "ctrl+shift+alt+17",
+        "command": "extension.catcharg",
+        "args": "17"
+      },
+      {
+        "key": "ctrl+shift+alt+18",
+        "command": "extension.catcharg",
+        "args": "18"
+      },
+      {
+        "key": "ctrl+shift+alt+19",
+        "command": "extension.catcharg",
+        "args": "19"
+      },
+      {
+        "key": "ctrl+shift+alt+20",
+        "command": "extension.catcharg",
+        "args": "20"
+      }
+    ]
+  },
+  "icon": "icon.png"
+}
