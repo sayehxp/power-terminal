@@ -2,15 +2,12 @@
 
 **Power Terminal** 💪 **Run all terminal commands with just one command**
 
-> **Power Terminal is an extension to run multi different commands easily. [Check Here](https://github.com/myrepo)**
+> **Power Terminal is an extension to run multi different commands easily. [Check Here](https://github.com/sayehxp/power-terminal.git)**
 >
 
-> ***[For 'feedback' [#78](https://github.com/myissuses)]***
-
+> ***(For Feedback → [#Click Here](https://github.com/sayehxp/power-terminal/issues))***
 
 **Create your cusstom command .**
-
-
 ![PowerTerminal](https://raw.githubusercontent.com/sayehxp/power-terminal/main/images/createcommand.gif)
 
 
