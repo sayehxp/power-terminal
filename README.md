@@ -11,7 +11,7 @@
 **Create your cusstom command .**
 
 
-![PowerTerminal](https://github.com/sayehxp/power-terminal/images/createcommand.gif)
+![PowerTerminal](https://raw.githubusercontent.com/sayehxp/power-terminal/main/images/createcommand.gif)
 
 
 

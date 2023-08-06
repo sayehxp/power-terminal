@@ -1,14 +1,10 @@
 {
-	"name": "PowerTerminal",
-	"displayName": "Power Terminal",
-	"description": "Create your custtom Commands and run them with one in Terminal",
-	"version": "1.0.0",
-	"publisher": "Ahmed_Elsayeh",
-	"author": {
-		"name": "sayehxp",
-		"email": "sayehxp@gmail.com"
-	},
-  
+  "name": "powerterminal",
+  "displayName": "Power Terminal",
+  "description": "Create your custtom Commands and run them with one in Terminal",
+  "version": "1.0.0",
+  "publisher": "Ahmed Elsayeh",
+  "author": "sayehxp <sayehxp@gmail.com>",
   "engines": {
     "vscode": "^1.0.0"
   },
@@ -147,5 +143,20 @@
       }
     ]
   },
-  "icon": "icon.png"
+  "icon": "icon.png",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sayehxp/power-terminal.git"
+  },
+  "keywords": [
+    "power"
+  ],
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/sayehxp/power-terminal/issues"
+  },
+  "homepage": "https://github.com/sayehxp/power-terminal#readme"
 }
