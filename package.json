@@ -159,6 +159,18 @@
         "command": "extension.catcharg",
         "args": "88"
       }
+      ,
+      {
+        "key": "ctrl+shift+alt+Y",
+        "command": "extension.catcharg",
+        "args": "89"
+      }
+      ,
+      {
+        "key": "ctrl+shift+alt+Z",
+        "command": "extension.catcharg",
+        "args": "90"
+      }
      
     ]
   },
