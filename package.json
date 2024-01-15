@@ -13,15 +13,11 @@
     "onCommand:extension.createnew",
     "onCommand:extension.execute",
     "onCommand:extension.catcharg",
-    "onCommand:extension.sync"
+    "onCommand:extension.delete"
   ],
   "contributes": {
     "commands": [
-      {
-        "command": "extension.sync",
-        "title": "Sync All",
-        "category": "Power Terminal"
-      },
+
       {
         "command": "extension.createnew",
         "title": "Create Command",
@@ -33,114 +29,137 @@
         "category": "Power Terminal"
       },
       {
+        "command": "extension.delete",
+        "title": "Delete Command",
+        "category": "Power Terminal"
+      },
+      {
         "command": "extension.catcharg"
       }
     ],
     "keybindings": [
+
       {
-        "key": "ctrl+shift+alt+99",
-        "command": "extension.sync"
+        "key": "ctrl+shift+alt+A",
+        "command": "extension.catcharg",
+        "args": "65"
       },
       {
-        "key": "ctrl+shift+alt+1",
+        "key": "ctrl+shift+alt+B",
         "command": "extension.catcharg",
-        "args": "1"
+        "args": "66"
       },
       {
-        "key": "ctrl+shift+alt+2",
+        "key": "ctrl+shift+alt+C",
         "command": "extension.catcharg",
-        "args": "2"
+        "args": "67"
       },
       {
-        "key": "ctrl+shift+alt+3",
+        "key": "ctrl+shift+alt+D",
         "command": "extension.catcharg",
-        "args": "3"
+        "args": "68"
       },
       {
-        "key": "ctrl+shift+alt+4",
+        "key": "ctrl+shift+alt+E",
         "command": "extension.catcharg",
-        "args": "4"
+        "args": "69"
       },
       {
-        "key": "ctrl+shift+alt+5",
+        "key": "ctrl+shift+alt+F",
         "command": "extension.catcharg",
-        "args": "5"
+        "args": "70"
       },
       {
-        "key": "ctrl+shift+alt+6",
+        "key": "ctrl+shift+alt+G",
         "command": "extension.catcharg",
-        "args": "6"
+        "args": "71"
       },
       {
-        "key": "ctrl+shift+alt+7",
+        "key": "ctrl+shift+alt+H",
         "command": "extension.catcharg",
-        "args": "7"
+        "args": "72"
       },
       {
-        "key": "ctrl+shift+alt+8",
+        "key": "ctrl+shift+alt+I",
         "command": "extension.catcharg",
-        "args": "8"
+        "args": "73"
       },
       {
-        "key": "ctrl+shift+alt+9",
+        "key": "ctrl+shift+alt+J",
         "command": "extension.catcharg",
-        "args": "9"
+        "args": "74"
       },
       {
-        "key": "ctrl+shift+alt+10",
+        "key": "ctrl+shift+alt+K",
         "command": "extension.catcharg",
-        "args": "10"
+        "args": "75"
       },
       {
-        "key": "ctrl+shift+alt+11",
+        "key": "ctrl+shift+alt+L",
         "command": "extension.catcharg",
-        "args": "11"
+        "args": "76"
       },
       {
-        "key": "ctrl+shift+alt+12",
+        "key": "ctrl+shift+alt+M",
         "command": "extension.catcharg",
-        "args": "12"
+        "args": "77"
       },
       {
-        "key": "ctrl+shift+alt+13",
+        "key": "ctrl+shift+alt+N",
         "command": "extension.catcharg",
-        "args": "13"
+        "args": "78"
       },
       {
-        "key": "ctrl+shift+alt+14",
+        "key": "ctrl+shift+alt+O",
         "command": "extension.catcharg",
-        "args": "14"
+        "args": "79"
       },
       {
-        "key": "ctrl+shift+alt+15",
+        "key": "ctrl+shift+alt+P",
         "command": "extension.catcharg",
-        "args": "15"
+        "args": "80"
       },
       {
-        "key": "ctrl+shift+alt+16",
+        "key": "ctrl+shift+alt+Q",
         "command": "extension.catcharg",
-        "args": "16"
+        "args": "81"
       },
       {
-        "key": "ctrl+shift+alt+17",
+        "key": "ctrl+shift+alt+R",
         "command": "extension.catcharg",
-        "args": "17"
+        "args": "82"
       },
       {
-        "key": "ctrl+shift+alt+18",
+        "key": "ctrl+shift+alt+S",
         "command": "extension.catcharg",
-        "args": "18"
+        "args": "83"
       },
       {
-        "key": "ctrl+shift+alt+19",
+        "key": "ctrl+shift+alt+T",
         "command": "extension.catcharg",
-        "args": "19"
+        "args": "84"
       },
       {
-        "key": "ctrl+shift+alt+20",
+        "key": "ctrl+shift+alt+U",
         "command": "extension.catcharg",
-        "args": "20"
+        "args": "85"
+      },
+      {
+        "key": "ctrl+shift+alt+V",
+        "command": "extension.catcharg",
+        "args": "86"
+      },
+      {
+        "key": "ctrl+shift+alt+W",
+        "command": "extension.catcharg",
+        "args": "87"
+      },
+      {
+        "key": "ctrl+shift+alt+X",
+        "command": "extension.catcharg",
+        "args": "88"
       }
+     
     ]
   },
   "icon": "icon.png",

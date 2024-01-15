@@ -2,12 +2,11 @@
 
 **Power Terminal** 💪 **Run all terminal commands with just one command**
 
-> **Power Terminal is an extension to run multi different commands easily. [Check Here](https://github.com/sayehxp/power-terminal.git)**
->
+ ****Power Terminal is a simple extension to run multi different commands easily or make a long in (VSCode) command simplify or shorter [Github Here](https://github.com/sayehxp/power-terminal.git)****
 
-> ***(For Feedback → [#Click Here](https://github.com/sayehxp/power-terminal/issues))***
+> **🖹 For Feedback : [Click Here](https://github.com/sayehxp/power-terminal/issues)**
 
-**Create your cusstom command .**
+**▬ Create your cusstom command** **⬇️**
 ![PowerTerminal](https://raw.githubusercontent.com/sayehxp/power-terminal/main/images/createcommand.gif)
 
 
@@ -15,26 +14,14 @@
 ### Create Command
 * `ctrl + p` , type  `Power Terminal: Create Command`
 * Type command name (without space) 
-* add " -x" to name to dispose pervious terminals
-* write your commands one by one
+* write your commands one next one
+* Please write your commands one by one.
 
-### Edit/Delete
-* in db.json in your `~\.vscode\extensions\powerTerminal` directory:
- ```  
-    {
-      "id": 1,
-      "name": "run",
-      "commands": [
-        "npx json-server -w data/db.json -p 8080",
-        "npm start"
-         ]
-    }
-```
-after edit or delete json file run `Power Terminal: sync` from Command Palette.
+### Delete Command
+* `ctrl + p` , type  `Power Terminal: Delete Command`
+* Type command name you want to delete.
+
 ### Run Command
-Command Palette → `Power Terminal: Run Command` hit enter , type command name
-Or just Write the Command name in Terminal 
-**note** : this option is available for Win OS only
-
-
-
+* `ctrl + p` , type  `Power Terminal: Run Command`
+* Type command name you want to run. Or just Write the Command name in Terminal
+* **note** : this option is available for Win OS only
