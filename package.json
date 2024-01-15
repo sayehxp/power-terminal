@@ -17,7 +17,6 @@
   ],
   "contributes": {
     "commands": [
-
       {
         "command": "extension.createnew",
         "title": "Create Command",
@@ -38,7 +37,6 @@
       }
     ],
     "keybindings": [
-
       {
         "key": "ctrl+shift+alt+A",
         "command": "extension.catcharg",
@@ -158,20 +156,17 @@
         "key": "ctrl+shift+alt+X",
         "command": "extension.catcharg",
         "args": "88"
-      }
-      ,
+      },
       {
         "key": "ctrl+shift+alt+Y",
         "command": "extension.catcharg",
         "args": "89"
-      }
-      ,
+      },
       {
         "key": "ctrl+shift+alt+Z",
         "command": "extension.catcharg",
         "args": "90"
       }
-     
     ]
   },
   "icon": "icon.png",
@@ -183,7 +178,12 @@
     "url": "git+https://github.com/sayehxp/power-terminal.git"
   },
   "keywords": [
-    "power"
+    "power",
+    "terminal",
+    "command",
+    "multi",
+    "shortcut",
+    "multi"
   ],
   "license": "ISC",
   "bugs": {
