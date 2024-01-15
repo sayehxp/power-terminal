@@ -2,7 +2,7 @@
   "name": "powerterminal",
   "displayName": "Power Terminal",
   "description": "Create your custtom Commands and run them with one in Terminal",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "publisher": "Ahmed Elsayeh",
   "author": "sayehxp <sayehxp@gmail.com>",
   "engines": {
