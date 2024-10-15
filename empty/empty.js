@@ -2,7 +2,14 @@ import React from 'react'
 
 const empty = () => {
     return (
-        <div>empty</div>
+        
+        <div>empty
+
+            lorem lorem console.log(
+                lorem
+            );
+            
+        </div>
     )
 }
 
