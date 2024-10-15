@@ -2,6 +2,9 @@ const fs = require("fs");
 const path = require("path");
 const vscode = require("vscode");
 const pathDB = path.join(__dirname, '..', "db.json");
+
+// updated
+const lg = "123"
 const getDB = async () => {
 
     try {
