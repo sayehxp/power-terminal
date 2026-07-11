@@ -3,7 +3,7 @@
   "displayName": "Power Terminal",
   "description": "Create your custom Commands and run them with one in Terminal",
   "version": "1.2.0",
-  "publisher": "Ahmed Elsayeh",
+  "publisher": "sayehxp",
   "author": "sayehxp <sayehxp@gmail.com>",
   "engines": {
     "vscode": "^1.0.0"

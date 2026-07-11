@@ -1,0 +1,6 @@
+.vs/**
+.vscode/**
+empty/**
+images/**
+*.vsix
+package-lock.json
