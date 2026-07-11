@@ -1,7 +1,7 @@
 //@ts-check
 const vscode = require("vscode");
 const { getDB, openTerminal } = require("../utilites/functions");
-const { showInputBox } = require("../utilites/vscode");
+const { showInputBox, vscodeMessageBox } = require("../utilites/vscode");
 let RunCommand = vscode.commands.registerCommand(
     "extension.execute",
     async () => {
@@ -12,8 +12,16 @@ let RunCommand = vscode.commands.registerCommand(
             `Enter Your Command name or Press Enter`
         );
 
-        const curCommandArr = allcommands.find((e) => e.name == commandName).commands;
-        openTerminal(curCommandArr);
+        if (!commandName) {
+            return;
+        }
+
+        const targetCommand = allcommands.find((e) => e.name == commandName);
+        if (!targetCommand) {
+            vscodeMessageBox(`Command "${commandName}" not found`);
+            return;
+        }
+        openTerminal([...targetCommand.commands]);
     }
 );
 

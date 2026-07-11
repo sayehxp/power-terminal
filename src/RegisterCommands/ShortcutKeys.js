@@ -8,8 +8,10 @@ let ShortcutKeys = vscode.commands.registerCommand(
         const jsonDB = await getDB();
         const allcommands = jsonDB.allcommands || [];
         const targetCommand = allcommands.find((e) => e.id == argument);
-        const curCommandArr = targetCommand.commands;
-        openTerminal(curCommandArr);
+        if (!targetCommand) {
+            return;
+        }
+        openTerminal([...targetCommand.commands]);
     }
 );
 

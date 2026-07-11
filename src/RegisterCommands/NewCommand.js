@@ -12,12 +12,12 @@ let NewCommand = vscode.commands.registerCommand(
     async () => {
         let commandName = await showInputBox("Enter your command name , spaces are not allowed", "Command Name");
 
+        if (!commandName) {
+            return
+        }
         if (commandName.includes(' ')) {
             vscodeMessageBox('space is not allowed please retry again');
             return;
-        }
-        if (!commandName) {
-            return
         }
         
         insertNewCommand([], commandName);

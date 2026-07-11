@@ -70,7 +70,7 @@
     },
     {
       "id": 73,
-      "name": "echo_numbers",
+      "name": "echo_words",
       "commands": [
         "echo one",
         "echo two"
@@ -79,6 +79,29 @@
     {
       "id": 74,
       "name": "print_numbers",
+      "commands": [
+        "echo 1",
+        "echo 2",
+        "echo 3"
+      ]
+    },
+    {
+      "id": 75,
+      "name": "po",
+      "commands": [
+        "echo po"
+      ]
+    },
+    {
+      "id": 76,
+      "name": "moo",
+      "commands": [
+        "echo moo"
+      ]
+    },
+    {
+      "id": 78,
+      "name": "numbers",
       "commands": [
         "echo 1",
         "echo 2",
