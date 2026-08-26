@@ -1,3 +1,12 @@
+## 1.3.0 - 2026-08-26
+
+- **Arguments**: the whole typed line is used now, not just the command name — `pull main` on a command holding `git pull origin` runs `git pull origin main`. Works in the *Run Command* input box and when typing the name straight into the terminal
+- Optional placeholders `$1`..`$9` and `$*` / `$@` put the arguments anywhere inside a saved command; without a placeholder they are appended to the last entry
+- Command names containing spaces (saved by older versions) still resolve — the longest matching name wins
+- Launchers created by older versions are brought up to date on startup, so existing commands accept arguments without being re-created
+- The `.vbs` launcher is no longer written on macOS/Linux, where it cannot run
+- Fix: deleting a command no longer reports "your command has been sucessuful inserted"
+
 ## 1.2.0 - 2026-07-11
 
 - New terminal behavior: a command with a **single** entry now runs in the currently active terminal; commands with **multiple** entries still open one separate terminal per entry

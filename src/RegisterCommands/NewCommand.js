@@ -1,10 +1,7 @@
-const Os = require("os");
 const vscode = require("vscode");
-const fs = require("fs");
-const path = require("path");
 const { showInputBox, vscodeMessageBox } = require("../utilites/vscode");
 const { getDB, postDB } = require("../utilites/functions");
-let appDataPath = path.join(Os.homedir(), "AppData\\Local\\Microsoft\\WindowsApps");
+const { createVBS } = require("../utilites/vbs");
 
 
 let NewCommand = vscode.commands.registerCommand(
@@ -19,7 +16,7 @@ let NewCommand = vscode.commands.registerCommand(
             vscodeMessageBox('space is not allowed please retry again');
             return;
         }
-        
+
         insertNewCommand([], commandName);
     }
 );
@@ -55,33 +52,13 @@ const insertNewCommand = async (commandArr, commandName) => {
 
             postDB(jsonDB)
             createVBS(commandName, commandId);
+            vscodeMessageBox(`your command has been sucessuful inserted`);
 
         }
     } catch (err) {
         vscodeMessageBox(err.toString());
     }
 };
-
-
-
-
-
-const createVBS = (commandName, commandId) => {
-    let path1 = appDataPath;
-    //older verison of windows
-    if (fs.existsSync(path1)) {
-        path1 = path.join(appDataPath, commandName.toString() + ".vbs");
-    } else {
-        path1 = path.join(Os.homedir(), commandName.toString() + ".vbs");
-    }
-
-    let convertTochar = String.fromCharCode(commandId);
-    let script = `set x = CreateObject("WScript.Shell") \n x.SendKeys "^+%${convertTochar}"`;
-    fs.writeFile(path1, script, (err) => {
-        if (err) vscode.window.activeTerminal.sendText(`echo ${err}`);
-    });
-    vscodeMessageBox(`your command has been sucessuful inserted`);
-}
 
 
 module.exports = {

@@ -1,6 +1,7 @@
 //@ts-check
 const vscode = require("vscode");
 const { openTerminal, getDB } = require("../utilites/functions");
+const { applyArgs, takeShortcutArgs } = require("../utilites/arguments");
 
 let ShortcutKeys = vscode.commands.registerCommand(
     "extension.catcharg",
@@ -11,7 +12,9 @@ let ShortcutKeys = vscode.commands.registerCommand(
         if (!targetCommand) {
             return;
         }
-        openTerminal([...targetCommand.commands]);
+        // arguments are only there when the .vbs launcher forwarded a typed terminal line
+        const args = takeShortcutArgs(targetCommand.id);
+        openTerminal(applyArgs(targetCommand.commands, args));
     }
 );
 
