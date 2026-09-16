@@ -4,18 +4,30 @@ const { ShortcutKeys } = require("./src/RegisterCommands/ShortcutKeys");
 const { RunCommand } = require("./src/RegisterCommands/RunCommand");
 const { DeleteCommand } = require("./src/RegisterCommands/DeleteCommand");
 const { initDB, getDB } = require("./src/utilites/functions");
-const { refreshVBS } = require("./src/utilites/vbs");
+const { useGlobalStorage, watchRequests } = require("./src/utilites/requests");
+const { refreshShims } = require("./src/utilites/shim");
 //______________________________________________________________
 function activate(context) {
     initDB(context);
-    // bring launchers saved by older versions up to date so they forward typed arguments
-    getDB().then((jsonDB) => refreshVBS(jsonDB.allcommands || []));
+    // both sides have to agree on the request dir before any launcher is written
+    useGlobalStorage(context);
+    // replace launchers saved by older versions, which pressed keys at the focused window
+    getDB()
+        .then((jsonDB) => refreshShims(jsonDB.allcommands || []))
+        .catch((err) => console.log("failed to refresh launchers", err));
     context.subscriptions.push(
         NewCommand,
         RunCommand,
         DeleteCommand,
-        ShortcutKeys
+        ShortcutKeys,
+        watchRequests()
     );
 }
-
 exports.activate = activate;
+
+function deactivate() { }
+
+module.exports = {
+    activate,
+    deactivate
+}

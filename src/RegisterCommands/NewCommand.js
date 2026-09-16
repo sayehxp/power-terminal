@@ -1,7 +1,7 @@
 const vscode = require("vscode");
 const { showInputBox, vscodeMessageBox } = require("../utilites/vscode");
 const { getDB, postDB } = require("../utilites/functions");
-const { createVBS } = require("../utilites/vbs");
+const { createShim } = require("../utilites/shim");
 
 
 let NewCommand = vscode.commands.registerCommand(
@@ -51,7 +51,7 @@ const insertNewCommand = async (commandArr, commandName) => {
 
 
             postDB(jsonDB)
-            createVBS(commandName, commandId);
+            createShim(newCommnand);
             vscodeMessageBox(`your command has been sucessuful inserted`);
 
         }

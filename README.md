@@ -61,4 +61,20 @@ Without a placeholder the arguments are appended to the **last** entry of the co
 ## Good to know
 
 * Your saved commands are stored in VS Code global storage, so they are **kept when the extension updates**
-* Each saved command also gets a keyboard shortcut (`ctrl + shift + alt + <letter>`) assigned automatically in order of creation
+* Each saved command also gets a keyboard shortcut (`ctrl + shift + alt + <letter>`) assigned automatically in order of creation, for the first 26 commands
+
+## Typing the command name in a terminal (Windows)
+
+Every command you create also gets a small `.cmd` launcher on your PATH, which is what lets you
+type the name in any terminal.
+
+* A **single entry** command runs directly from the shell — PowerShell, cmd, Git Bash, Windows
+  Terminal, any folder. VS Code does not have to be open or focused
+* A **multiple entries** command needs VS Code, since only VS Code can open a terminal per entry.
+  The launcher leaves a request that the running VS Code window picks up. If no window is open,
+  nothing happens and the request is discarded
+
+Launchers made by versions before 1.4.0 worked by pressing a keyboard shortcut at whatever window
+had focus, which typed stray characters into the prompt when VS Code was not focused or a
+different keyboard layout was active. Those are replaced automatically the first time 1.4.0
+starts.
