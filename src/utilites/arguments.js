@@ -1,7 +1,4 @@
 //@ts-check
-const fs = require("fs");
-const Os = require("os");
-const path = require("path");
 
 // A typed line can be more than a bare command name: `pull main` has to resolve to the
 // saved command `pull` with `main` handed over as an argument. Names created by this
@@ -30,6 +27,8 @@ const matchCommandLine = (allcommands, line) => {
 
 const PLACEHOLDER = /\$(\*|@|[1-9])/;
 
+const hasPlaceholder = (command) => PLACEHOLDER.test(command || "");
+
 // Builds the lines that actually reach the terminal.
 // `$*` / `$@` stand for the whole argument string, `$1`..`$9` for a single argument.
 // With no placeholder anywhere, the arguments are appended to the last entry, so typing
@@ -38,7 +37,7 @@ const applyArgs = (commands, args) => {
     const rest = (args || "").trim();
     const argv = rest ? rest.split(/\s+/) : [];
 
-    if (commands.some((command) => PLACEHOLDER.test(command))) {
+    if (commands.some(hasPlaceholder)) {
         return commands.map((command) =>
             command
                 .replace(/\$(\*|@|[1-9])/g, (_, token) =>
@@ -55,27 +54,6 @@ const applyArgs = (commands, args) => {
     );
 };
 
-const ARGS_MAX_AGE_MS = 5000;
-
-const shortcutArgsPath = (commandId) =>
-    path.join(Os.tmpdir(), `powerterminal-args-${commandId}.txt`);
-
-// The .vbs launcher drops whatever was typed after the command name here before it fires the
-// keyboard shortcut, which is how arguments survive the trip through the terminal. A file
-// older than a few seconds is a leftover (the shortcut was pressed by hand) and is ignored.
-const takeShortcutArgs = (commandId) => {
-    const argsPath = shortcutArgsPath(commandId);
-    try {
-        const stat = fs.statSync(argsPath);
-        const args = fs.readFileSync(argsPath, "utf8").trim();
-        fs.unlinkSync(argsPath);
-        if (Date.now() - stat.mtimeMs > ARGS_MAX_AGE_MS) return "";
-        return args;
-    } catch (err) {
-        return "";
-    }
-};
-
 module.exports = {
-    matchCommandLine, applyArgs, shortcutArgsPath, takeShortcutArgs
+    matchCommandLine, applyArgs, hasPlaceholder
 }
