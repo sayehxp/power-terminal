@@ -28,6 +28,8 @@ const deleteCommand = async (commandName) => {
             postDB(jsonDB)
             deleteShim(commandName);
             vscodeMessageBox(`${commandName} deleted`)
+        } else {
+            vscodeMessageBox(`Command "${commandName}" not found`)
         }
 
 

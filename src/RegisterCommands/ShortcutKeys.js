@@ -12,7 +12,7 @@ let ShortcutKeys = vscode.commands.registerCommand(
             return;
         }
         // a keybinding carries no arguments; type the name in a terminal to pass some
-        openTerminal([...targetCommand.commands]);
+        openTerminal([...targetCommand.commands], targetCommand.name);
     }
 );
 

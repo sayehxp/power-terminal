@@ -66,7 +66,7 @@ const runRequest = async (name) => {
     const match = matchCommandLine(jsonDB.allcommands || [], line);
     if (!match) return;
 
-    openTerminal(applyArgs(match.targetCommand.commands, match.args));
+    openTerminal(applyArgs(match.targetCommand.commands, match.args), match.targetCommand.name);
 };
 
 const sweep = () => {

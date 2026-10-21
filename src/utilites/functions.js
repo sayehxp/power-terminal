@@ -48,7 +48,7 @@ const postDB = async (data) => {
     }
 };
 
-const openTerminal = async (curCommandArr) => {
+const openTerminal = async (curCommandArr, name) => {
     try {
         // single command: reuse the active terminal instead of opening a new one
         if (curCommandArr.length === 1 && vscode.window.activeTerminal) {
@@ -58,10 +58,12 @@ const openTerminal = async (curCommandArr) => {
             return;
         }
 
-        // multiple commands (or no terminal open yet): each command gets its own new terminal
+        // multiple commands (or no terminal open yet): each command gets its own new terminal,
+        // created directly so the text cannot land in a terminal opened by someone else meanwhile
         for (const command of curCommandArr) {
-            await vscode.commands.executeCommand("workbench.action.terminal.new");
-            vscode.window.terminals[vscode.window.terminals.length - 1].sendText(command);
+            const terminal = vscode.window.createTerminal({ name: name || "Power Terminal" });
+            terminal.show();
+            terminal.sendText(command);
         }
     } catch (err) { }
 };
