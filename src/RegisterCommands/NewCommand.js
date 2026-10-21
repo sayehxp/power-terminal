@@ -1,7 +1,8 @@
 const vscode = require("vscode");
 const { showInputBox, vscodeMessageBox } = require("../utilites/vscode");
 const { getDB, postDB } = require("../utilites/functions");
-const { createShim } = require("../utilites/shim");
+const { createShim, launcherDir } = require("../utilites/shim");
+const { validateName } = require("../utilites/names");
 
 
 let NewCommand = vscode.commands.registerCommand(
@@ -12,8 +13,15 @@ let NewCommand = vscode.commands.registerCommand(
         if (!commandName) {
             return
         }
-        if (commandName.includes(' ')) {
-            vscodeMessageBox('space is not allowed please retry again');
+        commandName = commandName.trim();
+        const jsonDB = await getDB();
+        // the name becomes a launcher on PATH, so it must not hide a real program
+        const problem = validateName(commandName, {
+            allcommands: jsonDB.allcommands || [],
+            launcherDir: launcherDir(),
+        });
+        if (problem) {
+            vscodeMessageBox(problem);
             return;
         }
 
@@ -35,6 +43,8 @@ const insertNewCommand = async (commandArr, commandName) => {
         if (command) {
             commandArr.push(command);
             insertNewCommand(commandArr, commandName);
+        } else if (!commandArr.length) {
+            vscodeMessageBox(`${commandName} was not saved, it needs at least one command`);
         } else {
             //save
             let jsonDB = await getDB();
@@ -52,7 +62,7 @@ const insertNewCommand = async (commandArr, commandName) => {
 
             postDB(jsonDB)
             createShim(newCommnand);
-            vscodeMessageBox(`your command has been sucessuful inserted`);
+            vscodeMessageBox(`${commandName} saved`);
 
         }
     } catch (err) {
