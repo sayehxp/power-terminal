@@ -2,7 +2,7 @@
 const Os = require("os");
 const fs = require("fs");
 const path = require("path");
-const { hasPlaceholder } = require("./arguments");
+const { launcherScripts } = require("./launchers");
 const { requestsDir } = require("./requests");
 
 const appDataPath = path.join(Os.homedir(), "AppData", "Local", "Microsoft", "WindowsApps");
@@ -16,61 +16,33 @@ const launcherDir = () => (fs.existsSync(appDataPath) ? appDataPath : Os.homedir
 
 const shimPath = (commandName) => path.join(launcherDir(), commandName.toString() + ".cmd");
 
+// Git Bash ignores PATHEXT and looks for the bare name, so it gets an extensionless sh script
+// next to the .cmd. That is also what `! name` in Claude Code ends up running.
+const shPath = (commandName) => path.join(launcherDir(), commandName.toString());
+
 // Launchers written before 1.4.0 fired a keyboard shortcut at whatever window happened to
 // have focus. They are deleted on sight, and would shadow the .cmd anyway: .VBS comes
 // before .CMD in the default PATHEXT.
 const legacyPath = (commandName) => path.join(launcherDir(), commandName.toString() + ".vbs");
 
-const batchQuote = (value) => value.toString().replace(/%/g, "%%").replace(/\^/g, "^^");
-
-// `$1`..`$9` and `$*` / `$@` are the extension's own placeholder spelling; batch already has
-// the same idea as `%1`..`%9` and `%*`, so the translation is one for one. A command with no
-// placeholder gets `%*` appended, which is what makes `dev --port 3000` work.
-const withArgs = (command) => {
-    if (hasPlaceholder(command)) {
-        return command.replace(/\$(\*|@|[1-9])/g, (_, token) =>
-            token === "*" || token === "@" ? "%*" : `%${token}`
-        );
-    }
-    return `${command} %*`;
+// Only an existing file is rewritten, so a launcher nobody changed keeps its timestamp.
+const writeIfChanged = (target, content) => {
+    if (fs.existsSync(target) && fs.readFileSync(target, "utf8") === content) return;
+    fs.writeFileSync(target, content);
 };
 
-// A single command needs nothing from VS Code: you are already standing in a terminal, so the
-// launcher just runs it. `call` matters because npm, yarn and friends are themselves .cmd
-// files, and without it they never return to this script.
-const directScript = (command) => [
-    `@echo off`,
-    `call ${withArgs(command)}`,
-    ``,
-].join("\r\n");
-
-// Several commands mean one new terminal each, which only VS Code can do. The launcher leaves
-// a request behind and the extension picks it up; no focus, no keystrokes, no keyboard layout.
-// Writing to .tmp and moving into place keeps the watcher from reading a half-written file.
-const requestScript = (commandName, dir) => [
-    `@echo off`,
-    `setlocal`,
-    `if not exist "${dir}" mkdir "${dir}" >nul 2>&1`,
-    // path.join supplies the separator; a backslash written inline here would be eaten as an escape
-    `set "PT_REQ=${path.join(dir, "%RANDOM%-%RANDOM%-%TIME:~9,2%.req")}"`,
-    `> "%PT_REQ%.tmp" echo ${batchQuote(commandName)}`,
-    `if "%*"=="" (>> "%PT_REQ%.tmp" echo.) else (>> "%PT_REQ%.tmp" echo %*)`,
-    `move /y "%PT_REQ%.tmp" "%PT_REQ%" >nul`,
-    ``,
-].join("\r\n");
-
-const shimScript = (command) => {
-    const commands = (command && command.commands) || [];
-    if (commands.length === 1) return directScript(commands[0]);
-    return requestScript(command.name, requestsDir());
+const writeLaunchers = (command) => {
+    const scripts = launcherScripts(command, requestsDir());
+    writeIfChanged(shimPath(command.name), scripts.cmd);
+    writeIfChanged(shPath(command.name), scripts.sh);
+    // an old .vbs under the same name would win the PATHEXT race
+    if (fs.existsSync(legacyPath(command.name))) fs.unlinkSync(legacyPath(command.name));
 };
 
 const createShim = (command) => {
     if (!isWindows()) return;
     try {
-        fs.writeFileSync(shimPath(command.name), shimScript(command));
-        // an old .vbs under the same name would win the PATHEXT race
-        if (fs.existsSync(legacyPath(command.name))) fs.unlinkSync(legacyPath(command.name));
+        writeLaunchers(command);
     } catch (err) {
         console.log("failed to write the launcher", err);
     }
@@ -78,7 +50,7 @@ const createShim = (command) => {
 
 const deleteShim = (commandName) => {
     if (!isWindows()) return;
-    for (const target of [shimPath(commandName), legacyPath(commandName)]) {
+    for (const target of [shimPath(commandName), shPath(commandName), legacyPath(commandName)]) {
         try {
             if (fs.existsSync(target)) fs.unlinkSync(target);
         } catch (err) {
@@ -97,16 +69,10 @@ const refreshShims = (allcommands) => {
         const name = command && command.name;
         if (!name || name.toString().includes(" ")) continue;
         try {
-            const legacy = legacyPath(name);
-            const target = shimPath(name);
-            const hadLegacy = fs.existsSync(legacy);
-            if (!hadLegacy && !fs.existsSync(target)) continue;
-
-            const wanted = shimScript(command);
-            if (!fs.existsSync(target) || fs.readFileSync(target, "utf8") !== wanted) {
-                fs.writeFileSync(target, wanted);
-            }
-            if (hadLegacy) fs.unlinkSync(legacy);
+            const onDisk = [legacyPath(name), shimPath(name), shPath(name)].some((target) =>
+                fs.existsSync(target)
+            );
+            if (onDisk) writeLaunchers(command);
         } catch (err) {
             console.log("failed to refresh the launcher", err);
         }
@@ -114,5 +80,5 @@ const refreshShims = (allcommands) => {
 };
 
 module.exports = {
-    createShim, deleteShim, refreshShims, shimPath, legacyPath
+    createShim, deleteShim, refreshShims, shimPath, shPath, legacyPath, launcherDir
 }
