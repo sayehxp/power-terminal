@@ -65,14 +65,33 @@ Without a placeholder the arguments are appended to the **last** entry of the co
 
 ## Typing the command name in a terminal (Windows)
 
-Every command you create also gets a small `.cmd` launcher on your PATH, which is what lets you
-type the name in any terminal.
+Every command you create also gets two small launchers on your PATH, which is what lets you
+type the name in any terminal: `name.cmd` for PowerShell and cmd, and `name` (no extension) for
+Git Bash.
 
 * A **single entry** command runs directly from the shell — PowerShell, cmd, Git Bash, Windows
   Terminal, any folder. VS Code does not have to be open or focused
 * A **multiple entries** command needs VS Code, since only VS Code can open a terminal per entry.
   The launcher leaves a request that the running VS Code window picks up. If no window is open,
   nothing happens and the request is discarded
+
+### Works with AI CLIs
+
+Tools like Claude Code run shell commands through Git Bash, so your saved commands work there
+too: type `! dev` in Claude Code, or ask the agent to run `dev`, and the output comes back to it.
+
+### Command names
+
+The name becomes a program on your PATH, so Power Terminal refuses names that would hide
+something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `npm`, `node`...),
+anything already found on PATH, and names that are already saved. Names use letters, numbers,
+`-` and `_`.
+
+### `%` in saved commands
+
+The `.cmd` launcher runs your command through cmd, so `%PATH%` and other variables expand as
+usual; write `%%` for a literal `%`. The Git Bash launcher runs the same command through sh, so a
+command written in cmd syntax may not work there. Tools like `npm`, `git` and `node` work in both.
 
 Launchers made by versions before 1.4.0 worked by pressing a keyboard shortcut at whatever window
 had focus, which typed stray characters into the prompt when VS Code was not focused or a
