@@ -4,3 +4,4 @@ empty/**
 images/**
 *.vsix
 package-lock.json
+PLAN.md
