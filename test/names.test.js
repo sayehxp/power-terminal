@@ -10,8 +10,24 @@ test("accepts a plain name", () => {
 });
 
 test("rejects empty names, spaces and shell characters", () => {
-    for (const name of ["", "   ", "my dev", "a&b", "-x", "dev.cmd", "ä"]) {
+    for (const name of ["", "   ", "my dev", "a&b", "-x", "dev.cmd", "ابدأ الآن", "ابدأ!", "_ابدأ"]) {
         assert.ok(validateName(name, { launcherDir, lookup: nothingOnPath }), name);
+    }
+});
+
+test("accepts names in other languages, tashkeel included", () => {
+    for (const name of ["ابدأ", "شغل-السيرفر", "رفع_2", "ابْدَأْ", "démarrer", "ä"]) {
+        assert.strictEqual(validateName(name, { launcherDir, lookup: nothingOnPath }), null, name);
+    }
+});
+
+test("rejects another spelling of a saved Arabic name", () => {
+    const allcommands = [{ name: "ابدأ", commands: ["npm start"] }];
+    for (const name of ["ابدا", "إبدأ", "ابْدَأْ"]) {
+        assert.strictEqual(
+            validateName(name, { allcommands, launcherDir, lookup: nothingOnPath }),
+            `"${name}" already exists as "ابدأ"`
+        );
     }
 });
 

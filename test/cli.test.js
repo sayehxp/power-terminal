@@ -59,7 +59,7 @@ test("add: the real name check sees commands already saved", () => {
     const { options } = setup([{ id: 65, name: "dev", commands: ["npm run dev"] }]);
     const { validate, ...rest } = options;
     const result = run(["add", "DEV", "npm start"], rest);
-    assert.deepStrictEqual(result, { code: 1, out: `"DEV" already exists` });
+    assert.deepStrictEqual(result, { code: 1, out: `"DEV" already exists as "dev"` });
 });
 
 test("add: a name with no entries prints the usage", () => {
@@ -147,4 +147,17 @@ test("cli launcher: the editor steps aside for a pt installed from npm", { skip:
             else if (fs.existsSync(file)) fs.unlinkSync(file);
         });
     }
+});
+
+test("arabic: pt ضيف / امسح / اعرض, and any spelling deletes", () => {
+    const { dbFile, removed, options } = setup();
+    assert.deepStrictEqual(run(["ضيف", "ابدأ", "npm start"], options), { code: 0, out: "ابدأ saved" });
+    assert.deepStrictEqual(run(["أضف", "شغل", "npm run dev"], options).code, 0);
+    assert.match(run(["اعرض"], options).out, /ابدأ +npm start/);
+    assert.deepStrictEqual(run(["قائمة"], options).code, 0);
+
+    assert.deepStrictEqual(run(["امسح", "ابدا"], options), { code: 0, out: "ابدأ deleted" });
+    assert.deepStrictEqual(removed, ["ابدأ"]);
+    assert.deepStrictEqual(run(["احذف", "شغل"], options).code, 0);
+    assert.deepStrictEqual(readJSON(dbFile).allcommands, []);
 });

@@ -7,6 +7,7 @@ const path = require("path");
 const { sharedDir, readJSON, writeJSON } = require("./utilites/storage");
 const { validateName } = require("./utilites/names");
 const { createShim, deleteShim, launcherDir } = require("./utilites/shim");
+const { nameKey } = require("./utilites/arguments");
 
 const USAGE = [
     `usage:`,
@@ -18,6 +19,8 @@ const USAGE = [
     `  pt add dev "npm run dev"`,
     `  pt add stack "npm run api" "npm run web"`,
     `  pt add co "git checkout -b $1 origin/$2"`,
+    ``,
+    `in Arabic: pt ضيف / أضف, pt امسح / احذف, pt اعرض / قائمة`,
 ].join("\n");
 
 const defaults = () => ({
@@ -67,12 +70,14 @@ const remove = ([name], { dbFile, remove: deleteLaunchers }) => {
 
     const jsonDB = load(dbFile);
     const allcommands = jsonDB.allcommands || [];
-    if (!allcommands.some((command) => command.name == commandName)) {
+    // any spelling of the name finds it (ابدا for ابدأ); the launcher goes by the saved one
+    const found = allcommands.find((command) => nameKey(command.name) === nameKey(commandName));
+    if (!found) {
         return { code: 1, out: `Command "${commandName}" not found` };
     }
-    save(dbFile, { ...jsonDB, allcommands: allcommands.filter((command) => command.name != commandName) });
-    deleteLaunchers(commandName);
-    return { code: 0, out: `${commandName} deleted` };
+    save(dbFile, { ...jsonDB, allcommands: allcommands.filter((command) => command !== found) });
+    deleteLaunchers(found.name);
+    return { code: 0, out: `${found.name} deleted` };
 };
 
 const list = ({ dbFile }) => {
@@ -89,20 +94,28 @@ const list = ({ dbFile }) => {
 };
 
 // Returns what to print and the exit code instead of printing, so the tests can check both.
+// Actions can be typed in Arabic too, folded like names so أضف and اضف are the same.
 const run = (argv, options = {}) => {
     const deps = { ...defaults(), ...options };
     const [action, ...rest] = argv;
-    switch (action) {
+    switch (nameKey(action)) {
         case "add":
+        case "ضيف":
+        case "اضف":
             return add(rest, deps);
         case "rm":
         case "delete":
+        case "امسح":
+        case "احذف":
             return remove(rest, deps);
         case "ls":
         case "list":
+        case "اعرض":
+        case "قائمه":
             return list(deps);
-        case undefined:
+        case "":
         case "help":
+        case "مساعده":
         case "-h":
         case "--help":
             return { code: 0, out: USAGE };

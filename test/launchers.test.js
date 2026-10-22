@@ -123,3 +123,30 @@ test("sh request launcher writes the name and the arguments", { skip: !hasSh }, 
     execFileSync("sh", [file, "x & y", "$HOME"]);
     assert.deepStrictEqual(readRequest(dir), ["pt", "x & y $HOME"]);
 });
+
+test("cmd: ASCII launchers stay one line, others switch to UTF-8 and back", () => {
+    assert.doesNotMatch(launcherScripts({ name: "dev", commands: ["npm run dev"] }, "").cmd, /chcp/);
+    const arabic = launcherScripts({ name: "سلم", commands: ["echo مرحبا"] }, "").cmd;
+    assert.match(arabic, /chcp 65001/);
+    assert.match(arabic, /chcp %PT_CP%/);
+    assert.match(launcherScripts({ name: "ابدأ", commands: ["a", "b"] }, "C:\\req").cmd, /chcp 65001[\s\S]*chcp !PT_CP!/);
+});
+
+test("cmd: Arabic in the command, the name and the arguments arrives intact", { skip: !isWindows }, () => {
+    const dir = tempDir();
+    const echo = path.join(dir, "echo.js");
+    fs.writeFileSync(echo, `process.stdout.write(Buffer.from(process.argv.slice(2).join("|")).toString("hex"))`);
+    const hex = (text) => Buffer.from(text).toString("hex");
+
+    const direct = path.join(dir, "direct.cmd");
+    fs.writeFileSync(direct, launcherScripts({ name: "x", commands: [`node "${echo}" مرحبا`] }, dir).cmd);
+    assert.strictEqual(execSync(`"${direct}" سلام`, { encoding: "utf8" }), hex("مرحبا|سلام"));
+
+    const request = path.join(dir, "request.cmd");
+    fs.writeFileSync(request, launcherScripts({ name: "ابدأ", commands: ["a", "b"] }, dir).cmd);
+    execSync(`"${request}" سلام`);
+    assert.deepStrictEqual(readRequest(dir), ["ابدأ", "سلام"]);
+
+    // the console is left on the code page it had
+    assert.match(execSync(`chcp 437 >nul & "${direct}" & chcp`, { encoding: "utf8" }), /: 437/);
+});

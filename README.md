@@ -120,6 +120,27 @@ something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `n
 anything already found on PATH, and names that are already saved. Names use letters, numbers,
 `-` and `_`.
 
+### Arabic and other languages
+
+Names can use letters from any language, so a command can be called `ابدأ` or `رفع_الملفات`,
+and saved commands and arguments can contain Arabic text too:
+
+```
+pt ضيف ابدأ "npm start"          pt add, in Arabic (also أضف)
+ابدأ --port 3000                 type it in any terminal
+pt اعرض                          pt ls (also قائمة)
+pt امسح ابدأ                     pt rm (also احذف)
+```
+
+One Arabic word is often typed several ways, so `ابدأ`, `ابدا` and `إبدأ`, with or without
+tashkeel, count as the same name: saving a second spelling is refused, and *Run Command*,
+*Delete Command* and `pt rm` accept any of them. In the terminal itself, type the name as
+it was saved, since the shell looks for that exact file.
+
+The `.cmd` launchers switch the console to UTF-8 while a command with Arabic runs and put
+the old code page back afterwards, so Arabic reaches the program intact in cmd and
+PowerShell.
+
 ### `%` in saved commands
 
 The `.cmd` launcher runs your command through cmd, so `%PATH%` and other variables expand as

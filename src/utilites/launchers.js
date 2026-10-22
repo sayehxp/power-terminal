@@ -62,22 +62,46 @@ const callChain = (line) => {
     return parts.map((part, i) => (i < parts.length - 1 ? `call ${part}` : part)).join("");
 };
 
+// cmd reads a batch file, and writes files, in the console's code page (437, 720...), so Arabic
+// or any other non-ASCII text arrives as mojibake or `?`. Switching to UTF-8 (65001) fixes both.
+// The old code page is read back from `chcp` (`%%~n` drops the trailing dot some languages
+// print) and restored at the end, so the console the user typed in is left as it was.
+const UTF8_ON = [
+    `for /f "tokens=*" %%a in ('chcp') do for %%b in (%%a) do set "PT_CP=%%~nb"`,
+    `chcp 65001 >nul`,
+];
+
+const isAscii = (text) => /^[\x00-\x7f]*$/.test(text);
+
 // A single command needs nothing from VS Code: you are already standing in a terminal, so the
-// launcher just runs it.
-const cmdDirectScript = (command) => [
-    `@echo off`,
-    callChain(cmdWithArgs(command)),
-    ``,
-].join("\r\n");
+// launcher just runs it. ASCII commands stay a bare one-liner. The others restore the code page
+// and keep the exit code on one line, which cmd expands before running, so the variables can be
+// cleared without leaking into the caller's session. A last part that is itself a .cmd (npm)
+// never returns, and then the console simply stays on UTF-8.
+const cmdDirectScript = (command) => {
+    if (isAscii(command)) {
+        return [`@echo off`, callChain(cmdWithArgs(command)), ``].join("\r\n");
+    }
+    return [
+        `@echo off`,
+        ...UTF8_ON,
+        callChain(cmdWithArgs(command)),
+        `set PT_EXIT=%errorlevel%`,
+        `chcp %PT_CP% >nul & set "PT_CP=" & set "PT_EXIT=" & exit /b %PT_EXIT%`,
+        ``,
+    ].join("\r\n");
+};
 
 // Several commands mean one new terminal each, which only VS Code can do. The launcher leaves
 // a request behind and the extension picks it up; no focus, no keystrokes, no keyboard layout.
 // Writing to .tmp and moving into place keeps the watcher from reading a half-written file.
 // The arguments are stored while delayed expansion is off and printed with it on, so `&`, `|`,
-// `>` and `!` inside them are written as text instead of being run.
+// `>` and `!` inside them are written as text instead of being run. The typed arguments are
+// unknown ahead of time, so this one always writes in UTF-8.
 const cmdRequestScript = (commandName, dir) => [
     `@echo off`,
     `setlocal DisableDelayedExpansion`,
+    ...UTF8_ON,
     `set PT_ARGS=%*`,
     `if not exist "${dir}" mkdir "${dir}" >nul 2>&1`,
     // the separator is written by hand; a path.join here would turn %RANDOM% into a file name
@@ -85,6 +109,7 @@ const cmdRequestScript = (commandName, dir) => [
     `setlocal EnableDelayedExpansion`,
     `> "!PT_REQ!.tmp" (echo(${commandName}& echo(!PT_ARGS!)`,
     `move /y "!PT_REQ!.tmp" "!PT_REQ!" >nul`,
+    `chcp !PT_CP! >nul`,
     ``,
 ].join("\r\n");
 

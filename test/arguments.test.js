@@ -19,6 +19,17 @@ test("matchCommandLine prefers the longest name and needs a whole word", () => {
     assert.strictEqual(matchCommandLine(saved, ""), null);
 });
 
+test("matchCommandLine finds an Arabic name in any spelling, arguments as typed", () => {
+    const arabic = [{ name: "ابدأ", commands: ["npm start"] }, { name: "رفع الملفات", commands: ["git push"] }];
+    for (const typed of ["ابدأ", "ابدا", "إبدأ", "ابْدَأْ"]) {
+        const match = matchCommandLine(arabic, `${typed} --port 3000`);
+        assert.strictEqual(match && match.targetCommand.name, "ابدأ", typed);
+        assert.strictEqual(match.args, "--port 3000");
+    }
+    assert.strictEqual(matchCommandLine(arabic, "رفع  الملفات origin").args, "origin");
+    assert.strictEqual(matchCommandLine(arabic, "ابدأها"), null);
+});
+
 test("applyArgs appends to the last entry when there is no placeholder", () => {
     assert.deepStrictEqual(applyArgs(["cd app", "npm start"], "--port 3000"), ["cd app", "npm start --port 3000"]);
     assert.deepStrictEqual(applyArgs(["npm start"], ""), ["npm start"]);
