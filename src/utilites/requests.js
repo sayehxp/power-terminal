@@ -2,7 +2,6 @@
 const fs = require("fs");
 const Os = require("os");
 const path = require("path");
-const { getDB, openTerminal } = require("./functions");
 const { sharedDir } = require("./storage");
 const { matchCommandLine, applyArgs } = require("./arguments");
 
@@ -64,6 +63,9 @@ const runRequest = async (name) => {
 
     if (!taken.fresh || !line) return;
 
+    // required here, not at the top: functions.js needs VS Code, and the `pt` CLI loads this
+    // file (through shim.js) outside of it
+    const { getDB, openTerminal } = require("./functions");
     const jsonDB = await getDB();
     const match = matchCommandLine(jsonDB.allcommands || [], line);
     if (!match) return;

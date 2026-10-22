@@ -1,3 +1,9 @@
+## 1.6.0
+
+- **`pt` command line**: create, delete and list commands from any terminal — `pt add dev "npm run dev"`, `pt rm dev`, `pt ls`. It edits the same shared commands and launchers as the editor, so AI CLIs like Claude Code can make commands for you. Runs on the editor's own executable, no Node install needed
+- **Also on npm**: `npm install -g powerterminal` gives you `pt` without installing the extension in any editor. When both are installed the npm one is used
+- `pt` is now a reserved command name
+
 ## 1.5.0
 
 - **One set of commands for every editor**: VS Code, Cursor, Antigravity and other forks each kept their own copy of your commands, so a command saved in one was missing in the others. They now share one `db.json` (`%APPDATA%\powerterminal` on Windows, `~/Library/Application Support/powerterminal` on macOS, `~/.config/powerterminal` on Linux)

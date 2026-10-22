@@ -113,6 +113,24 @@ const launcherScripts = (command, dir) => {
     return { cmd: cmdRequestScript(command.name, dir), sh: shRequestScript(command.name, dir) };
 };
 
+// The `pt` CLI runs on the editor's own executable instead of needing Node installed:
+// ELECTRON_RUN_AS_NODE turns Code.exe (or Cursor.exe...) into plain Node, which is how VS Code's
+// own `code` command works.
+const cliScripts = (execPath, script) => ({
+    cmd: [
+        `@echo off`,
+        `setlocal`,
+        `set ELECTRON_RUN_AS_NODE=1`,
+        `"${execPath}" "${script}" %*`,
+        ``,
+    ].join("\r\n"),
+    sh: [
+        `#!/bin/sh`,
+        `ELECTRON_RUN_AS_NODE=1 exec ${shQuote(shPath(execPath))} ${shQuote(shPath(script))} "$@"`,
+        ``,
+    ].join("\n"),
+});
+
 module.exports = {
-    cmdWithArgs, shWithArgs, launcherScripts
+    cmdWithArgs, shWithArgs, launcherScripts, cliScripts
 }

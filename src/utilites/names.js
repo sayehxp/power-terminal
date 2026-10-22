@@ -22,6 +22,8 @@ const RESERVED = new Set([
     "unset", "wait",
     // tools
     "git", "npm", "npx", "node", "yarn", "pnpm", "code", "python", "pip", "docker", "wsl",
+    // this extension's own CLI
+    "pt",
 ]);
 
 // Launchers this extension wrote itself are not a conflict: re-creating a deleted command
@@ -102,5 +104,5 @@ const validateName = (name, { allcommands = [], launcherDir = "", lookup = findO
 };
 
 module.exports = {
-    validateName
+    validateName, findOnPath, isOurLauncher
 }

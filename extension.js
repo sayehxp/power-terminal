@@ -1,11 +1,12 @@
 //@ts-check
+const path = require("path");
 const { NewCommand } = require("./src/RegisterCommands/NewCommand");
 const { ShortcutKeys } = require("./src/RegisterCommands/ShortcutKeys");
 const { RunCommand } = require("./src/RegisterCommands/RunCommand");
 const { DeleteCommand } = require("./src/RegisterCommands/DeleteCommand");
 const { initDB, getDB } = require("./src/utilites/functions");
 const { useSharedStorage, watchRequests } = require("./src/utilites/requests");
-const { refreshShims } = require("./src/utilites/shim");
+const { refreshShims, installCli } = require("./src/utilites/shim");
 const { vscodeMessageBox } = require("./src/utilites/vscode");
 //______________________________________________________________
 function activate(context) {
@@ -16,6 +17,8 @@ function activate(context) {
     getDB()
         .then((jsonDB) => refreshShims(jsonDB.allcommands || []))
         .catch((err) => console.log("failed to refresh launchers", err));
+    // `pt add` / `pt rm` from any terminal, so commands can be made without the editor
+    installCli(process.execPath, path.join(context.extensionPath, "bin", "pt.js"));
     context.subscriptions.push(
         NewCommand,
         RunCommand,
