@@ -4,13 +4,14 @@ const { ShortcutKeys } = require("./src/RegisterCommands/ShortcutKeys");
 const { RunCommand } = require("./src/RegisterCommands/RunCommand");
 const { DeleteCommand } = require("./src/RegisterCommands/DeleteCommand");
 const { initDB, getDB } = require("./src/utilites/functions");
-const { useGlobalStorage, watchRequests } = require("./src/utilites/requests");
+const { useSharedStorage, watchRequests } = require("./src/utilites/requests");
 const { refreshShims } = require("./src/utilites/shim");
+const { vscodeMessageBox } = require("./src/utilites/vscode");
 //______________________________________________________________
 function activate(context) {
-    initDB(context);
+    reportImport(initDB(context));
     // both sides have to agree on the request dir before any launcher is written
-    useGlobalStorage(context);
+    useSharedStorage();
     // replace launchers saved by older versions, which pressed keys at the focused window
     getDB()
         .then((jsonDB) => refreshShims(jsonDB.allcommands || []))
@@ -24,6 +25,17 @@ function activate(context) {
     );
 }
 exports.activate = activate;
+
+// Only said once, on the start that moved the commands; later starts import nothing.
+const reportImport = (result) => {
+    if (!result || (!result.added.length && !result.skipped.length)) return;
+    let message = `Power Terminal: your commands are now shared between VS Code, Cursor and Antigravity (${result.added.length} brought over).`;
+    const skipped = [...new Set(result.skipped)];
+    if (skipped.length) {
+        message += ` Already saved under the same name, so not copied again: ${skipped.join(", ")}`;
+    }
+    vscodeMessageBox(message);
+};
 
 function deactivate() { }
 

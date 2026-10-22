@@ -3,6 +3,7 @@ const fs = require("fs");
 const Os = require("os");
 const path = require("path");
 const { getDB, openTerminal } = require("./functions");
+const { sharedDir } = require("./storage");
 const { matchCommandLine, applyArgs } = require("./arguments");
 
 // A request older than this was left behind while VS Code was closed. Running it now would
@@ -13,12 +14,13 @@ let dir = path.join(Os.tmpdir(), "powerterminal-requests");
 
 // Launchers for multi-command entries drop a file here instead of pressing keys at whatever
 // window has focus. The directory has to be somewhere both sides agree on before any launcher
-// is written, so activate() sets it first thing.
+// is written, so activate() sets it first thing. It is shared by every editor, so whichever
+// one is open picks the request up.
 const requestsDir = () => dir;
 
-const useGlobalStorage = (context) => {
+const useSharedStorage = () => {
     try {
-        dir = path.join(context.globalStorageUri.fsPath, "requests");
+        dir = path.join(sharedDir(), "requests");
     } catch (err) {
         console.log("falling back to the temp dir for launcher requests", err);
     }
@@ -30,7 +32,7 @@ const useGlobalStorage = (context) => {
     return dir;
 };
 
-// Two VS Code windows watch the same directory, so both see the file. The rename is atomic:
+// Every open window of every editor watches the same directory, so both see the file. The rename is atomic:
 // whoever wins gets the request, the loser gets ENOENT and does nothing.
 const claim = (name) => {
     const source = path.join(dir, name);
@@ -97,5 +99,5 @@ const watchRequests = () => {
 };
 
 module.exports = {
-    requestsDir, useGlobalStorage, watchRequests
+    requestsDir, useSharedStorage, watchRequests
 }
