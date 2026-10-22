@@ -1,29 +1,45 @@
 const fs = require("fs");
 const path = require("path");
 const vscode = require("vscode");
+const { sharedDir, writeJSON, importCommands, legacyDatabases } = require("./storage");
 
 const bundledDB = path.join(__dirname, "..", "db.json");
 let pathDB = bundledDB;
 
-// Store db.json in VS Code's global storage so saved commands survive extension updates.
-// Called once from activate(). Falls back to the bundled db.json if storage is unavailable.
+// One db.json shared by every editor, so a command saved in VS Code also exists in Cursor and
+// Antigravity. Called once from activate(). The databases older versions kept per editor are
+// copied in on the first start; what was added or left out is returned so it can be reported.
 const initDB = (context) => {
     try {
-        const storageDir = context.globalStorageUri.fsPath;
-        fs.mkdirSync(storageDir, { recursive: true });
-        const storedDB = path.join(storageDir, "db.json");
+        const dir = sharedDir();
+        fs.mkdirSync(dir, { recursive: true });
+        const sharedDB = path.join(dir, "db.json");
+        if (!fs.existsSync(sharedDB)) writeJSON(sharedDB, { allcommands: [] });
+        pathDB = sharedDB;
 
-        if (!fs.existsSync(storedDB)) {
-            if (fs.existsSync(bundledDB)) {
-                fs.copyFileSync(bundledDB, storedDB);
-            } else {
-                fs.writeFileSync(storedDB, JSON.stringify({ allcommands: [] }, null, 2));
-            }
+        const added = [];
+        const skipped = [];
+        for (const source of legacyDatabases(context.globalStorageUri.fsPath)) {
+            const result = importCommands(sharedDB, source);
+            if (!result) continue;
+            added.push(...result.added);
+            skipped.push(...result.skipped);
         }
+        return { added, skipped };
+    } catch (err) {
+        console.log("failed to init the shared db.json", err);
+    }
+
+    // shared folder unusable: keep working out of this editor's own storage like before
+    try {
+        const storedDB = path.join(context.globalStorageUri.fsPath, "db.json");
+        fs.mkdirSync(path.dirname(storedDB), { recursive: true });
+        if (!fs.existsSync(storedDB)) writeJSON(storedDB, { allcommands: [] });
         pathDB = storedDB;
     } catch (err) {
         console.log("failed to init global storage, using bundled db.json", err);
     }
+    return null;
 };
 
 const getDB = async () => {
@@ -39,9 +55,7 @@ const getDB = async () => {
 
 const postDB = async (data) => {
     try {
-        fs.writeFile(pathDB, JSON.stringify(data, null, 2), (err) => {
-            if (err) console.log(err);
-        });
+        writeJSON(pathDB, data);
     } catch (failed) {
         console.log("failed to write db.json");
         console.log(pathDB);

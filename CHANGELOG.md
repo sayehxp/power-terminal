@@ -1,3 +1,11 @@
+## 1.5.0
+
+- **One set of commands for every editor**: VS Code, Cursor, Antigravity and other forks each kept their own copy of your commands, so a command saved in one was missing in the others. They now share one `db.json` (`%APPDATA%\powerterminal` on Windows, `~/Library/Application Support/powerterminal` on macOS, `~/.config/powerterminal` on Linux)
+- **Multiple entries launchers work with any editor**: the request folder is shared too, so typing the name in a terminal opens the terminals in whichever editor is running, instead of only the one that created the launcher
+- Commands saved by earlier versions in any of these editors are brought over on the first start, once. If two editors saved different commands under the same name, the running editor's version is kept and you are told which names clashed. The old files are left untouched
+- Saving is now written to a temporary file and moved into place, so two editors reading at the same moment never see half a file
+- **Names Git Bash already uses are refused**: Git Bash runs its own tools (`yes`, `head`, `sort`, `sleep`...) before anything on the Windows PATH, and the name check could not see them. A command called `yes` ran the real `yes` in Git Bash and Claude Code, printing `y` until it was killed
+
 ## 1.4.0
 
 - **Fix: typing a command name no longer spills junk characters into the prompt.** Launchers used to press `ctrl+shift+alt+<letter>` and hope VS Code was the focused window. When it was not — a terminal outside VS Code, a different keyboard layout, a conflicting shortcut — Windows read `ctrl+alt` as AltGr and typed a literal character instead of running anything

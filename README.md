@@ -60,7 +60,8 @@ Without a placeholder the arguments are appended to the **last** entry of the co
 
 ## Good to know
 
-* Your saved commands are stored in VS Code global storage, so they are **kept when the extension updates**
+* Your saved commands are kept in one place shared by **VS Code, Cursor, Antigravity** and other VS Code based editors (`%APPDATA%\powerterminal\db.json` on Windows), so a command saved in one editor works in all of them and survives extension updates
+* A launcher for a **multiple entries** command is picked up by whichever of those editors is open
 * Each saved command also gets a keyboard shortcut (`ctrl + shift + alt + <letter>`) assigned automatically in order of creation, for the first 26 commands
 
 ## Typing the command name in a terminal (Windows)
