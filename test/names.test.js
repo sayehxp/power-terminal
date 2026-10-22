@@ -40,3 +40,20 @@ test("ignores launchers this extension left behind", () => {
     const lookup = () => [`${launcherDir}\\dev`, `${launcherDir}\\dev.cmd`, `${launcherDir.toLowerCase()}\\dev.vbs`];
     assert.strictEqual(validateName("dev", { launcherDir, lookup }), null);
 });
+
+test("rejects a name Git Bash already has a program for", () => {
+    const fs = require("fs");
+    const os = require("os");
+    const path = require("path");
+    const git = fs.mkdtempSync(path.join(os.tmpdir(), "pt-git-"));
+    fs.mkdirSync(path.join(git, "cmd"));
+    fs.mkdirSync(path.join(git, "usr", "bin"), { recursive: true });
+    fs.writeFileSync(path.join(git, "usr", "bin", "yes.exe"), "");
+    fs.writeFileSync(path.join(git, "usr", "bin", "bashbug"), "");
+    // where finds git.exe in Git\cmd, and nothing for the name itself
+    const lookup = (name) => (name === "git" ? [path.join(git, "cmd", "git.exe")] : []);
+
+    assert.match(validateName("yes", { launcherDir, lookup }), /Git Bash program/);
+    assert.match(validateName("bashbug", { launcherDir, lookup }), /Git Bash program/);
+    assert.strictEqual(validateName("deploy", { launcherDir, lookup }), null);
+});
