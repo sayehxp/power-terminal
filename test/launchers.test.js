@@ -132,6 +132,22 @@ test("cmd: ASCII launchers stay one line, others switch to UTF-8 and back", () =
     assert.match(launcherScripts({ name: "ابدأ", commands: ["a", "b"] }, "C:\\req").cmd, /chcp 65001[\s\S]*chcp !PT_CP!/);
 });
 
+test("cmd: emoji in the command, the name and the arguments arrive intact", { skip: !isWindows }, () => {
+    const dir = tempDir();
+    const echo = path.join(dir, "echo.js");
+    fs.writeFileSync(echo, `process.stdout.write(Buffer.from(process.argv.slice(2).join("|")).toString("hex"))`);
+    const hex = (text) => Buffer.from(text).toString("hex");
+
+    const direct = path.join(dir, "direct.cmd");
+    fs.writeFileSync(direct, launcherScripts({ name: "x", commands: [`node "${echo}" 🎉`] }, dir).cmd);
+    assert.strictEqual(execSync(`"${direct}" 🍕👍🏽`, { encoding: "utf8" }), hex("🎉|🍕👍🏽"));
+
+    const request = path.join(dir, "request.cmd");
+    fs.writeFileSync(request, launcherScripts({ name: "🔥", commands: ["a", "b"] }, dir).cmd);
+    execSync(`"${request}" 🍕`);
+    assert.deepStrictEqual(readRequest(dir), ["🔥", "🍕"]);
+});
+
 test("cmd: Arabic in the command, the name and the arguments arrives intact", { skip: !isWindows }, () => {
     const dir = tempDir();
     const echo = path.join(dir, "echo.js");

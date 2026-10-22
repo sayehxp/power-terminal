@@ -118,7 +118,7 @@ There are two ways to get `pt`:
 The name becomes a program on your PATH, so Power Terminal refuses names that would hide
 something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `npm`, `node`...), `pt` itself,
 anything already found on PATH, and names that are already saved. Names use letters, numbers,
-`-` and `_`.
+emoji, `-` and `_`.
 
 ### Arabic and other languages
 
@@ -140,6 +140,22 @@ it was saved, since the shell looks for that exact file.
 The `.cmd` launchers switch the console to UTF-8 while a command with Arabic runs and put
 the old code page back afterwards, so Arabic reaches the program intact in cmd and
 PowerShell.
+
+### Emoji
+
+Emoji work as names too, alone or mixed with letters, and inside commands and arguments:
+
+```
+pt add 🚀 "npm run deploy"
+🚀 --prod                        type it in any terminal
+pt add deploy🔥 "npm run build && npm run deploy"
+```
+
+Skin tones (`👍🏽`), joined emoji (`👨‍💻`), flags (`🇪🇬`) and keycaps (`1️⃣`) are all fine.
+An emoji typed with or without its variation selector (`❤` / `❤️`) counts as the same name in
+*Run Command*, *Delete Command* and `pt rm`; in the terminal, type it the way it was saved.
+The old Windows console (conhost) may not let you type or show emoji, but the command still
+runs. Windows Terminal, the VS Code terminal and Git Bash show them properly.
 
 ### `%` in saved commands
 

@@ -12,6 +12,8 @@ const nameKey = (name) =>
         .replace(/[أإآٱ]/g, "ا")
         .replace(/ى/g, "ي")
         .replace(/ة/g, "ه")
+        // ❤ and ❤️ differ only by a variation selector that keyboards add or leave out
+        .replace(/\uFE0F/g, "")
         .toLowerCase();
 
 // A typed line can be more than a bare command name: `pull main` has to resolve to the
