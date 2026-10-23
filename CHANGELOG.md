@@ -1,3 +1,16 @@
+## Unreleased
+
+- **Arabic command names**: names can use letters from any language — `ابدأ`, `رفع_الملفات` — and type straight into any terminal
+- Arabic spellings of one word (`ابدأ` / `ابدا` / `إبدأ`, tashkeel, `ة`/`ه`, `ى`/`ي`) count as the same name, so a duplicate is refused and Run / Delete find it either way. Name matching is no longer case-sensitive, like the duplicate check already was
+- `pt` actions in Arabic: `pt ضيف` / `أضف`, `pt امسح` / `احذف`, `pt اعرض` / `قائمة`
+- Fix: Arabic (or any non-ASCII text) inside a saved command, or typed as an argument to a multi-entry command, was garbled by cmd. The `.cmd` launchers now run in UTF-8 and restore the console's code page afterwards
+
+## 1.6.0
+
+- **`pt` command line**: create, delete and list commands from any terminal — `pt add dev "npm run dev"`, `pt rm dev`, `pt ls`. It edits the same shared commands and launchers as the editor, so AI CLIs like Claude Code can make commands for you. Runs on the editor's own executable, no Node install needed
+- **Also on npm**: `npm install -g powerterminal` gives you `pt` without installing the extension in any editor. When both are installed the npm one is used
+- `pt` is now a reserved command name
+
 ## 1.5.0
 
 - **One set of commands for every editor**: VS Code, Cursor, Antigravity and other forks each kept their own copy of your commands, so a command saved in one was missing in the others. They now share one `db.json` (`%APPDATA%\powerterminal` on Windows, `~/Library/Application Support/powerterminal` on macOS, `~/.config/powerterminal` on Linux)

@@ -2,10 +2,12 @@
 const fs = require("fs");
 const path = require("path");
 const { execFileSync } = require("child_process");
+const { nameKey } = require("./arguments");
 
 // A launcher lands on PATH, so a careless name can hide a real program in every shell:
-// a command called `git` would turn every `git` into the saved command.
-const NAME_PATTERN = /^[A-Za-z0-9][A-Za-z0-9_-]*$/;
+// a command called `git` would turn every `git` into the saved command. Letters and digits
+// from any language are fine (ابدأ, démarrer); \p{M} lets tashkeel and accents through.
+const NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{M}_-]*$/u;
 
 // Shell built-ins never show up in `where`, but a launcher named after one still gets in the
 // way in the shells that do look at PATH for it. The tools at the end are blocked even when
@@ -22,6 +24,8 @@ const RESERVED = new Set([
     "unset", "wait",
     // tools
     "git", "npm", "npx", "node", "yarn", "pnpm", "code", "python", "pip", "docker", "wsl",
+    // this extension's own CLI
+    "pt",
 ]);
 
 // Launchers this extension wrote itself are not a conflict: re-creating a deleted command
@@ -87,8 +91,11 @@ const validateName = (name, { allcommands = [], launcherDir = "", lookup = findO
     if (RESERVED.has(value.toLowerCase())) {
         return `"${value}" is a built-in shell command or a common tool, choose another name`;
     }
-    if (allcommands.some((command) => (command.name || "").toString().toLowerCase() === value.toLowerCase())) {
-        return `"${value}" already exists`;
+    // ابدا and ابدأ would reach the same command everywhere names are matched
+    const existing = allcommands.find((command) => nameKey(command.name) === nameKey(value));
+    if (existing) {
+        const saved = String(existing.name);
+        return saved === value ? `"${value}" already exists` : `"${value}" already exists as "${saved}"`;
     }
     const clash = lookup(value).find((found) => !isOurLauncher(found, launcherDir));
     if (clash) {
@@ -102,5 +109,5 @@ const validateName = (name, { allcommands = [], launcherDir = "", lookup = findO
 };
 
 module.exports = {
-    validateName
+    validateName, findOnPath, isOurLauncher
 }

@@ -2,8 +2,9 @@
 const Os = require("os");
 const fs = require("fs");
 const path = require("path");
-const { launcherScripts } = require("./launchers");
+const { launcherScripts, cliScripts } = require("./launchers");
 const { requestsDir } = require("./requests");
+const { findOnPath, isOurLauncher } = require("./names");
 
 const appDataPath = path.join(Os.homedir(), "AppData", "Local", "Microsoft", "WindowsApps");
 
@@ -79,6 +80,26 @@ const refreshShims = (allcommands) => {
     }
 };
 
+// Puts `pt` on PATH next to the command launchers. Rewritten on every start, since the editor
+// and extension paths it points at change with each update. A `pt` installed from npm wins:
+// ours is removed, so the two never fight over which one PATH finds first.
+const installCli = (execPath, script, lookup = findOnPath) => {
+    if (!isWindows()) return;
+    try {
+        if (lookup("pt").some((found) => !isOurLauncher(found, launcherDir()))) {
+            for (const target of [shimPath("pt"), shPath("pt")]) {
+                if (fs.existsSync(target)) fs.unlinkSync(target);
+            }
+            return;
+        }
+        const scripts = cliScripts(execPath, script);
+        writeIfChanged(shimPath("pt"), scripts.cmd);
+        writeIfChanged(shPath("pt"), scripts.sh);
+    } catch (err) {
+        console.log("failed to install the pt launcher", err);
+    }
+};
+
 module.exports = {
-    createShim, deleteShim, refreshShims, shimPath, shPath, legacyPath, launcherDir
+    createShim, deleteShim, refreshShims, installCli, shimPath, shPath, legacyPath, launcherDir
 }

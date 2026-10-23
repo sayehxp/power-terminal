@@ -81,12 +81,65 @@ Git Bash.
 Tools like Claude Code run shell commands through Git Bash, so your saved commands work there
 too: type `! dev` in Claude Code, or ask the agent to run `dev`, and the output comes back to it.
 
+### Creating commands from the terminal: `pt`
+
+The extension also puts a `pt` command on your PATH, so commands can be created and deleted
+from any terminal without opening the command palette:
+
+```
+pt add dev "npm run dev"                    one entry
+pt add stack "npm run api" "npm run web"    one quoted argument per entry
+pt add co "git checkout -b $1 origin/$2"    placeholders work the same way
+pt ls                                       list saved commands
+pt rm dev                                   delete a command
+```
+
+It saves to the same shared `db.json` and writes the same launchers, so the command is usable
+straight away and shows up in every editor. The same name rules apply.
+
+An AI CLI can use it too: ask Claude Code to *"make a power terminal command called `deploy`
+that builds and pushes"* and it can run `pt add deploy ...` itself.
+
+There are two ways to get `pt`:
+
+* **With the extension**: it is written when VS Code, Cursor or Antigravity starts, and runs on
+  the editor's own executable, so Node does not need to be installed
+* **Without any editor**, from npm (needs Node 14+):
+
+  ```
+  npm install -g powerterminal
+  ```
+
+  Single entry commands work fully without an editor; multiple entries ones still need one
+  open. When both are installed, the npm `pt` is used and the extension leaves it alone.
+
 ### Command names
 
 The name becomes a program on your PATH, so Power Terminal refuses names that would hide
-something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `npm`, `node`...),
+something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `npm`, `node`...), `pt` itself,
 anything already found on PATH, and names that are already saved. Names use letters, numbers,
 `-` and `_`.
+
+### Arabic and other languages
+
+Names can use letters from any language, so a command can be called `ابدأ` or `رفع_الملفات`,
+and saved commands and arguments can contain Arabic text too:
+
+```
+pt ضيف ابدأ "npm start"          pt add, in Arabic (also أضف)
+ابدأ --port 3000                 type it in any terminal
+pt اعرض                          pt ls (also قائمة)
+pt امسح ابدأ                     pt rm (also احذف)
+```
+
+One Arabic word is often typed several ways, so `ابدأ`, `ابدا` and `إبدأ`, with or without
+tashkeel, count as the same name: saving a second spelling is refused, and *Run Command*,
+*Delete Command* and `pt rm` accept any of them. In the terminal itself, type the name as
+it was saved, since the shell looks for that exact file.
+
+The `.cmd` launchers switch the console to UTF-8 while a command with Arabic runs and put
+the old code page back afterwards, so Arabic reaches the program intact in cmd and
+PowerShell.
 
 ### `%` in saved commands
 
