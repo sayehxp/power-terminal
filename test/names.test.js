@@ -21,6 +21,26 @@ test("accepts names in other languages, tashkeel included", () => {
     }
 });
 
+test("accepts emoji names: single, mixed, skin tones, joined, flags, keycaps", () => {
+    for (const name of ["🚀", "deploy🔥", "🚀-prod", "ابدأ🚀", "👍🏽", "👨‍💻", "🇪🇬", "1️⃣", "❤️", "🏴󠁧󠁢󠁳󠁣󠁴󠁿"]) {
+        assert.strictEqual(validateName(name, { launcherDir, lookup: nothingOnPath }), null, name);
+    }
+});
+
+test("still rejects symbols that are not emoji", () => {
+    for (const name of ["🚀 now", "🚀!", "$🚀", "🚀.cmd", "#️⃣"]) {
+        assert.ok(validateName(name, { launcherDir, lookup: nothingOnPath }), name);
+    }
+});
+
+test("rejects an emoji saved with or without its variation selector", () => {
+    const allcommands = [{ name: "❤️", commands: ["echo love"] }];
+    assert.strictEqual(
+        validateName("❤", { allcommands, launcherDir, lookup: nothingOnPath }),
+        `"❤" already exists as "❤️"`
+    );
+});
+
 test("rejects another spelling of a saved Arabic name", () => {
     const allcommands = [{ name: "ابدأ", commands: ["npm start"] }];
     for (const name of ["ابدا", "إبدأ", "ابْدَأْ"]) {

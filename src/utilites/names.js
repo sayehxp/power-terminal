@@ -7,7 +7,12 @@ const { nameKey } = require("./arguments");
 // A launcher lands on PATH, so a careless name can hide a real program in every shell:
 // a command called `git` would turn every `git` into the saved command. Letters and digits
 // from any language are fine (ابدأ, démarrer); \p{M} lets tashkeel and accents through.
-const NAME_PATTERN = /^[\p{L}\p{N}][\p{L}\p{N}\p{M}_-]*$/u;
+// Emoji are file names like any other, so 🚀 or deploy🔥 work too. Most emoji are one
+// pictograph, but skin tones (👍🏽), joined ones (👨‍💻, glued with U+200D), flags (🇪🇬, two
+// regional indicators) and subdivision flags (tag characters) are sequences; the variation
+// selector and keycap mark (1️⃣) are already in \p{M}.
+const NAME_PATTERN =
+    /^[\p{L}\p{N}\p{Extended_Pictographic}\p{Regional_Indicator}][\p{L}\p{N}\p{M}\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\u{E0020}-\u{E007F}_-]*$/u;
 
 // Shell built-ins never show up in `where`, but a launcher named after one still gets in the
 // way in the shells that do look at PATH for it. The tools at the end are blocked even when
@@ -86,7 +91,7 @@ const validateName = (name, { allcommands = [], launcherDir = "", lookup = findO
     const value = (name || "").trim();
     if (!value) return "Command name is empty";
     if (!NAME_PATTERN.test(value)) {
-        return `"${value}" can only use letters, numbers, "-" and "_", and must start with a letter or number`;
+        return `"${value}" can only use letters, numbers, emoji, "-" and "_", and must start with a letter, number or emoji`;
     }
     if (RESERVED.has(value.toLowerCase())) {
         return `"${value}" is a built-in shell command or a common tool, choose another name`;

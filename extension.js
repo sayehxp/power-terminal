@@ -17,7 +17,7 @@ function activate(context) {
     getDB()
         .then((jsonDB) => refreshShims(jsonDB.allcommands || []))
         .catch((err) => console.log("failed to refresh launchers", err));
-    // `pt add` / `pt rm` from any terminal, so commands can be made without the editor
+    // `pt add` / `pt remove` from any terminal, so commands can be made without the editor
     installCli(process.execPath, path.join(context.extensionPath, "bin", "pt.js"));
     context.subscriptions.push(
         NewCommand,

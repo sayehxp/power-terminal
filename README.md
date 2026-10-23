@@ -90,8 +90,8 @@ from any terminal without opening the command palette:
 pt add dev "npm run dev"                    one entry
 pt add stack "npm run api" "npm run web"    one quoted argument per entry
 pt add co "git checkout -b $1 origin/$2"    placeholders work the same way
-pt ls                                       list saved commands
-pt rm dev                                   delete a command
+pt list                                     list saved commands
+pt remove dev                               delete a command
 ```
 
 It saves to the same shared `db.json` and writes the same launchers, so the command is usable
@@ -118,7 +118,7 @@ There are two ways to get `pt`:
 The name becomes a program on your PATH, so Power Terminal refuses names that would hide
 something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `npm`, `node`...), `pt` itself,
 anything already found on PATH, and names that are already saved. Names use letters, numbers,
-`-` and `_`.
+emoji, `-` and `_`.
 
 ### Arabic and other languages
 
@@ -128,18 +128,34 @@ and saved commands and arguments can contain Arabic text too:
 ```
 pt ضيف ابدأ "npm start"          pt add, in Arabic (also أضف)
 ابدأ --port 3000                 type it in any terminal
-pt اعرض                          pt ls (also قائمة)
-pt امسح ابدأ                     pt rm (also احذف)
+pt اعرض                          pt list (also قائمة)
+pt امسح ابدأ                     pt remove (also احذف)
 ```
 
 One Arabic word is often typed several ways, so `ابدأ`, `ابدا` and `إبدأ`, with or without
 tashkeel, count as the same name: saving a second spelling is refused, and *Run Command*,
-*Delete Command* and `pt rm` accept any of them. In the terminal itself, type the name as
+*Delete Command* and `pt remove` accept any of them. In the terminal itself, type the name as
 it was saved, since the shell looks for that exact file.
 
 The `.cmd` launchers switch the console to UTF-8 while a command with Arabic runs and put
 the old code page back afterwards, so Arabic reaches the program intact in cmd and
 PowerShell.
+
+### Emoji
+
+Emoji work as names too, alone or mixed with letters, and inside commands and arguments:
+
+```
+pt add 🚀 "npm run deploy"
+🚀 --prod                        type it in any terminal
+pt add deploy🔥 "npm run build && npm run deploy"
+```
+
+Skin tones (`👍🏽`), joined emoji (`👨‍💻`), flags (`🇪🇬`) and keycaps (`1️⃣`) are all fine.
+An emoji typed with or without its variation selector (`❤` / `❤️`) counts as the same name in
+*Run Command*, *Delete Command* and `pt remove`; in the terminal, type it the way it was saved.
+The old Windows console (conhost) may not let you type or show emoji, but the command still
+runs. Windows Terminal, the VS Code terminal and Git Bash show them properly.
 
 ### `%` in saved commands
 
