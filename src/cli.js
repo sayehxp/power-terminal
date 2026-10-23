@@ -12,8 +12,8 @@ const { nameKey } = require("./utilites/arguments");
 const USAGE = [
     `usage:`,
     `  pt add <name> <command> [command...]   save a command, one quoted argument per entry`,
-    `  pt rm <name>                           delete a command`,
-    `  pt ls                                  list saved commands`,
+    `  pt remove <name>                       delete a command`,
+    `  pt list                                list saved commands`,
     ``,
     `examples:`,
     `  pt add dev "npm run dev"`,
@@ -103,13 +103,15 @@ const run = (argv, options = {}) => {
         case "ضيف":
         case "اضف":
             return add(rest, deps);
-        case "rm":
+        case "remove":
         case "delete":
+        // the 1.6.0 names, kept so scripts written for them still work
+        case "rm":
         case "امسح":
         case "احذف":
             return remove(rest, deps);
-        case "ls":
         case "list":
+        case "ls":
         case "اعرض":
         case "قائمه":
             return list(deps);

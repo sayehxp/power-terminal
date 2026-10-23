@@ -69,31 +69,38 @@ test("add: a name with no entries prints the usage", () => {
     assert.match(result.out, /^usage:/);
 });
 
-test("rm: deletes the command and its launchers", () => {
+test("remove: deletes the command and its launchers", () => {
     const { dbFile, removed, options } = setup([
         { id: 65, name: "dev", commands: ["npm run dev"] },
         { id: 66, name: "web", commands: ["npm run web"] },
     ]);
-    assert.deepStrictEqual(run(["rm", "dev"], options), { code: 0, out: "dev deleted" });
+    assert.deepStrictEqual(run(["remove", "dev"], options), { code: 0, out: "dev deleted" });
     assert.deepStrictEqual(readJSON(dbFile).allcommands.map((c) => c.name), ["web"]);
     assert.deepStrictEqual(removed, ["dev"]);
 });
 
-test("rm: a missing command says so and touches nothing", () => {
+test("remove: a missing command says so and touches nothing", () => {
     const { removed, options } = setup();
-    assert.deepStrictEqual(run(["rm", "nope"], options), { code: 1, out: `Command "nope" not found` });
+    assert.deepStrictEqual(run(["remove", "nope"], options), { code: 1, out: `Command "nope" not found` });
     assert.deepStrictEqual(removed, []);
 });
 
-test("ls: one line per entry, the name only on the first", () => {
+test("list: one line per entry, the name only on the first", () => {
     const { options } = setup([
         { id: 65, name: "dev", commands: ["npm run dev"] },
         { id: 66, name: "stack", commands: ["npm run api", "npm run web"] },
     ]);
-    assert.deepStrictEqual(run(["ls"], options), {
+    assert.deepStrictEqual(run(["list"], options), {
         code: 0,
         out: ["dev    npm run dev", "stack  npm run api", "       npm run web"].join("\n"),
     });
+});
+
+test("rm and ls still work as the old names of remove and list", () => {
+    const { removed, options } = setup([{ id: 65, name: "dev", commands: ["npm run dev"] }]);
+    assert.deepStrictEqual(run(["ls"], options), { code: 0, out: "dev  npm run dev" });
+    assert.deepStrictEqual(run(["rm", "dev"], options), { code: 0, out: "dev deleted" });
+    assert.deepStrictEqual(removed, ["dev"]);
 });
 
 test("unknown actions fail, no action prints the usage", () => {

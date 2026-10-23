@@ -3,6 +3,7 @@
 - **Arabic command names**: names can use letters from any language — `ابدأ`, `رفع_الملفات` — and type straight into any terminal
 - **Emoji command names**: `🚀`, `deploy🔥`, `👍🏽`, `👨‍💻`, `🇪🇬` and `1️⃣` work as names in cmd, PowerShell, Git Bash and Claude Code. `❤` and `❤️` count as the same name
 - Arabic spellings of one word (`ابدأ` / `ابدا` / `إبدأ`, tashkeel, `ة`/`ه`, `ى`/`ي`) count as the same name, so a duplicate is refused and Run / Delete find it either way. Name matching is no longer case-sensitive, like the duplicate check already was
+- `pt remove` and `pt list` replace `pt rm` and `pt ls`, which still work
 - `pt` actions in Arabic: `pt ضيف` / `أضف`, `pt امسح` / `احذف`, `pt اعرض` / `قائمة`
 - Fix: Arabic (or any non-ASCII text) inside a saved command, or typed as an argument to a multi-entry command, was garbled by cmd. The `.cmd` launchers now run in UTF-8 and restore the console's code page afterwards
 
