@@ -2,7 +2,7 @@ const vscode = require("vscode");
 const { showInputBox, vscodeMessageBox } = require("../utilites/vscode");
 const { getDB, postDB } = require("../utilites/functions");
 const { createShim, launcherDir } = require("../utilites/shim");
-const { validateName } = require("../utilites/names");
+const { validateName, powershellHint } = require("../utilites/names");
 
 
 let NewCommand = vscode.commands.registerCommand(
@@ -62,7 +62,8 @@ const insertNewCommand = async (commandArr, commandName) => {
 
             postDB(jsonDB)
             createShim(newCommnand);
-            vscodeMessageBox(`${commandName} saved`);
+            const hint = powershellHint(commandName);
+            vscodeMessageBox(hint ? `${commandName} saved, ${hint}` : `${commandName} saved`);
 
         }
     } catch (err) {

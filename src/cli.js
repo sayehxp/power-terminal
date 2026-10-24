@@ -5,7 +5,7 @@
 const fs = require("fs");
 const path = require("path");
 const { sharedDir, readJSON, writeJSON } = require("./utilites/storage");
-const { validateName } = require("./utilites/names");
+const { validateName, powershellHint } = require("./utilites/names");
 const { createShim, deleteShim, launcherDir } = require("./utilites/shim");
 const { nameKey } = require("./utilites/arguments");
 
@@ -58,6 +58,8 @@ const add = ([name, ...entries], { dbFile, dir, validate, create }) => {
     create(command);
 
     const lines = [`${commandName} saved`];
+    const hint = powershellHint(commandName);
+    if (hint) lines.push(hint);
     if (commands.length > 1) {
         lines.push(`it opens one terminal per entry, so it only runs while VS Code, Cursor or Antigravity is open`);
     }

@@ -10,9 +10,19 @@ const { nameKey } = require("./arguments");
 // Emoji are file names like any other, so 🚀 or deploy🔥 work too. Most emoji are one
 // pictograph, but skin tones (👍🏽), joined ones (👨‍💻, glued with U+200D), flags (🇪🇬, two
 // regional indicators) and subdivision flags (tag characters) are sequences; the variation
-// selector and keycap mark (1️⃣) are already in \p{M}.
+// selector and keycap mark (1️⃣) are already in \p{M}. `+`, `-` and `_` run fine anywhere in
+// cmd and Git Bash, so `+` or `c++` are names too; other symbols are shell syntax somewhere.
 const NAME_PATTERN =
-    /^[\p{L}\p{N}\p{Extended_Pictographic}\p{Regional_Indicator}][\p{L}\p{N}\p{M}\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\u{E0020}-\u{E007F}_-]*$/u;
+    /^[\p{L}\p{N}\p{Extended_Pictographic}\p{Regional_Indicator}+_-][\p{L}\p{N}\p{M}\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\u{E0020}-\u{E007F}+_-]*$/u;
+
+// PowerShell reads a line starting with `+`, `-1` or `1+` as math instead of a command, so
+// those names have to be called with `&` there. `-dev` is fine: a dash and a letter is a
+// command name to it.
+const powershellHint = (name) => {
+    const value = (name || "").toString().trim();
+    if (!/^\+|^-(?![A-Za-z])|^\p{N}+[+-]/u.test(value)) return null;
+    return `in PowerShell, run it as: & '${value}'`;
+};
 
 // Shell built-ins never show up in `where`, but a launcher named after one still gets in the
 // way in the shells that do look at PATH for it. The tools at the end are blocked even when
@@ -91,7 +101,7 @@ const validateName = (name, { allcommands = [], launcherDir = "", lookup = findO
     const value = (name || "").trim();
     if (!value) return "Command name is empty";
     if (!NAME_PATTERN.test(value)) {
-        return `"${value}" can only use letters, numbers, emoji, "-" and "_", and must start with a letter, number or emoji`;
+        return `"${value}" can only use letters, numbers, emoji, "+", "-" and "_"`;
     }
     if (RESERVED.has(value.toLowerCase())) {
         return `"${value}" is a built-in shell command or a common tool, choose another name`;
@@ -114,5 +124,5 @@ const validateName = (name, { allcommands = [], launcherDir = "", lookup = findO
 };
 
 module.exports = {
-    validateName, findOnPath, isOurLauncher
+    validateName, powershellHint, findOnPath, isOurLauncher
 }
