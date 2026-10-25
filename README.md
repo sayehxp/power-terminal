@@ -1,89 +1,67 @@
-  # Power Terminal
+# Power Terminal
+**Power Terminal** ⚡ **Your own terminal commands: save once, run anywhere by name**
 
-  **Power Terminal** ⚡ **Your own terminal commands: save once, run anywhere by name**
-
-  **Power Terminal saves your long or repeated commands under short names, so you type `dev` instead of `npm run dev` in any terminal, editor or AI CLI, or type `start` to run your frontend, backend and database together, each in its own terminal.**
-
-  > **🖹 For Feedback : [Click Here](https://github.com/sayehxp/power-terminal/issues)**
-
-  **▬ Create your custom command** **⬇️**
-  ![PowerTerminal](https://raw.githubusercontent.com/sayehxp/power-terminal/main/images/createcommand.gif)
+Power Terminal saves your long or repeated commands under short names, so typing `dev`
+launches `npm run dev`. It can also run several commands at once, like typing `startall` to
+start your frontend, backend and database servers together.
 
 
+# How to use
+  For [IDE](#IDES) (VS Code, Cursor and Antigravity),
 
-  # How to use
+  For [CLI](#CLI) Claude Code , Codex , Windows Terminal
 
-  ## 1. IDE (VS Code, Cursor and Antigravity)
+   
+## 1.Inside IDE 
 
-  ### Create Command
-  * `ctrl + shift + p` , type `Power Terminal: Create Command`
-  * Type a name (no spaces)
-  * Type your commands one by one, then press Enter on an empty line
 
-  ### Run Command
-  * `ctrl + shift + p` , type `Power Terminal: Run Command`
-  * Type the name, plus any [arguments](#passing-arguments)
-  * Or use its shortcut, `ctrl + shift + alt + <letter>` (first 26 commands)
+### Create Command
+* `ctrl + shift + p` , type `Power Terminal: Create Command`
+* Type a name (no spaces)
+* Type your commands one by one, then press Enter on an empty line
 
-  ### Delete Command
-  * `ctrl + shift + p` , type `Power Terminal: Delete Command`
-  * Type the name
+### Run Command
+* `ctrl + shift + p` , type `Power Terminal: Run Command`
+* Type the name, plus any [arguments](#passing-arguments)
 
-  ## 2. In any terminal
 
-  Just type the command name in any terminal, inside your IDE or outside it: the VS Code,
-  Cursor or Antigravity terminal, PowerShell, cmd, Git Bash or Windows Terminal, from any folder.
+### Delete Command
+* `ctrl + shift + p` , type `Power Terminal: Delete Command`
+* Type the name
 
-  * **One command**: runs right there, no IDE needed
-  * **Several commands**: each opens in its own terminal, so your IDE must be open
 
-  > Typing the name in a terminal works on Windows only.
+## 2.In CLI (Windows)
+  Saved commands are ordinary programs on your PATH - you can Just type the command name in any terminal, in AI CLIs like **Claude Code**, **Codex**
+  and **Gemini CLI** can use them directly **Using** `!` followed by the name
 
-  ## 3. In AI CLIs
+  ***note*** : Several commands each opens in its own terminal, so IDE must be open
 
-  Saved commands are ordinary programs on your PATH, so AI CLIs like **Claude Code**, **Codex**
-  and **Gemini CLI** can use them directly:
 
-  * **Run one yourself** with `!` followed by the name: `! dev` or `! test --watch`. The output
-    lands in the conversation, so the agent sees it too
-  * **Let the agent run them**: ask *"run `test` and fix what fails"* and it calls your command
-    like any other tool
+ ### Take Full Control with CLI
 
-  `!` is meant for commands that print something and finish. A program that waits for typing,
-  like an editor or a CLI's own chat, belongs in a normal terminal.
-
-  ### Manage commands with `pt`
-
-  Create, list and delete commands from any terminal or AI CLI:
-
-  ```
-  pt add dev "npm run dev"                    save a command
-  pt add stack "npm run api" "npm run web"    several commands, one quoted argument each
-  pt add co "git checkout -b $1 origin/$2"    with placeholders
-  pt list                                     list saved commands
-  pt remove dev                               delete a command
-  ```
-
-  AI agents can use it too: ask for *"a command called `deploy` that builds and pushes"* and the
-  agent runs `pt add` itself.
-
-  On Windows, the extension adds `pt` for you.
-
-  ## 4. Without an IDE
-
-  Don't use VS Code, Cursor or Antigravity? Install Power Terminal from npm instead (needs Node 14+):
+  if u want to add , remove and delete commands without tocuh ides all works get done by cli u can do that using `pt` commands it installed with extension and u can install it standalone as npm package 
 
   ```
   npm install -g powerterminal
   ```
 
-  This gives you `pt`, so you can save commands and run them by name in any terminal or AI CLI,
-  no IDE needed. Only commands with several entries still need an IDE open, since each entry
-  opens in its own IDE terminal.
+  ```
+  pt add <name> <command/s>      save a command
+  pt list                        list saved commands
+  pt remove <name>               delete a command
+  ```
 
-  > Running commands by name is Windows only for now. On Mac and Linux, commands made with `pt`
-  > show up in your IDE's *Run Command* only.
+  For example :
 
+  ```
+  pt add 📦 "npm install -g"
+  pt add 🗑️ "npm uninstall"
+
+  📦 axios cfonts colors    ->  npm install axios,cfonts,colors 
+  🗑️ axios                  ->  npm uninstall axios
+  ```
+
+  
   ## Passing arguments
 
   Add arguments after the name, just like a normal command. To place them anywhere in your
@@ -94,9 +72,11 @@
 
   ```
   saved command : npm install $1 --save-dev
-  you type      : devdep typescript
+  you type      : need typescript
   runs          : npm install typescript --save-dev
+  
   ```
+  
 
   No placeholders? The arguments are simply added to the end:
 
@@ -108,53 +88,19 @@
 
   ## Why Power Terminal
 
-  **Shorter AI CLI commands.** One command covers every model:
+  **Save once, use everywhere.** Create a command in one place, from any IDE (vscode,agy,cursor ..etc ) or even with `pt`, and
+  run it in any terminal, or in an AI CLI. 
+  
 
-  ```
-  pt add c "claude --model"            c opus, c sonnet, c haiku
-  pt add cx "codex -m"                 cx <model>
-  ```
+  **Still useful with AI.** Asking an AI to run your commands is bit
+  slower. AI agents can call your powerterminal commands too.
 
-  **Short names for Windows tools.** The original keeps working:
+  **Name it your way.** Use English, Arabic (`ابدأ`) or emoji (`🚀`). Names that would hide a real program, like `git` or `cd`, are refused.
 
-  ```
-  pt add paint mspaint                 paint photo.png
-  pt add here "explorer ."             open the current folder
-  pt add settings "explorer ms-settings:"
-  ```
+  **A saved prompt, everywhere.** A command can also hold a prompt you reuse, like
+  `claude -p "review my staged changes"`. A skill belongs to one tool; a saved command works in
+  every folder and every terminal.
 
-  **Everyday commands.**
-
-  ```
-  pt add st "git status -sb"
-  pt add push "git push -u origin HEAD"
-  pt add killport "npx kill-port"      killport 3000
-  ```
-
-  **Safe names.** A name that would hide something real, like `git`, `cd` or `calc`, is refused.
-  Names use letters, numbers, emoji, `+`, `-` and `_`, so `+` or `c++` work too.
-
-  **Arabic and emoji.** Names and commands can be in any language, or emoji:
-
-  ```
-  pt add ابدأ "npm start"
-  pt add 🚀 "npm run deploy"
-  ```
-
-  `pt` speaks Arabic too: `pt ضيف` (add), `pt اعرض` (list), `pt امسح` (remove). Spellings like
-  `ابدأ`, `ابدا` and `إبدأ` count as the same name. In a terminal, type the name as it was saved.
-
-  ## Good to know
-
-  * Your saved commands are kept in one place shared by every editor and by `pt`
-    (`%APPDATA%\powerterminal\db.json` on Windows), so a command saved in one editor works in all
-    of them and survives extension updates
-
-  ### `%` in saved commands
-
-  The `.cmd` launcher runs your command through cmd, so `%PATH%` and other variables expand as
-  usual; write `%%` for a literal `%`. The Git Bash launcher runs the same command through sh, so a
-  command written in cmd syntax may not work there. Tools like `npm`, `git` and `node` work in both.
 
   ### Upgrading from before 1.4.0
 
@@ -162,3 +108,4 @@
   had focus, which typed stray characters into the prompt when VS Code was not focused or a
   different keyboard layout was active. Those are replaced automatically the first time 1.4.0
   starts.
+  
