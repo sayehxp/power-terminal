@@ -14,6 +14,7 @@ start your frontend, backend and database servers together.
    
 ## 1.Inside IDE 
 
+![PowerTerminal](https://raw.githubusercontent.com/sayehxp/power-terminal/main/images/createcommand.gif)
 
 ### Create Command
 * `ctrl + shift + p` , type `Power Terminal: Create Command`
