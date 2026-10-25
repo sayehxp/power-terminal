@@ -1,0 +1,128 @@
+//@ts-check
+const fs = require("fs");
+const path = require("path");
+const { execFileSync } = require("child_process");
+const { nameKey } = require("./arguments");
+
+// A launcher lands on PATH, so a careless name can hide a real program in every shell:
+// a command called `git` would turn every `git` into the saved command. Letters and digits
+// from any language are fine (ابدأ, démarrer); \p{M} lets tashkeel and accents through.
+// Emoji are file names like any other, so 🚀 or deploy🔥 work too. Most emoji are one
+// pictograph, but skin tones (👍🏽), joined ones (👨‍💻, glued with U+200D), flags (🇪🇬, two
+// regional indicators) and subdivision flags (tag characters) are sequences; the variation
+// selector and keycap mark (1️⃣) are already in \p{M}. `+`, `-` and `_` run fine anywhere in
+// cmd and Git Bash, so `+` or `c++` are names too; other symbols are shell syntax somewhere.
+const NAME_PATTERN =
+    /^[\p{L}\p{N}\p{Extended_Pictographic}\p{Regional_Indicator}+_-][\p{L}\p{N}\p{M}\p{Extended_Pictographic}\p{Emoji_Modifier}\p{Regional_Indicator}\u200D\u{E0020}-\u{E007F}+_-]*$/u;
+
+// PowerShell reads a line starting with `+`, `-1` or `1+` as math instead of a command, so
+// those names have to be called with `&` there. `-dev` is fine: a dash and a letter is a
+// command name to it.
+const powershellHint = (name) => {
+    const value = (name || "").toString().trim();
+    if (!/^\+|^-(?![A-Za-z])|^\p{N}+[+-]/u.test(value)) return null;
+    return `in PowerShell, run it as: & '${value}'`;
+};
+
+// Shell built-ins never show up in `where`, but a launcher named after one still gets in the
+// way in the shells that do look at PATH for it. The tools at the end are blocked even when
+// they are not installed yet.
+const RESERVED = new Set([
+    // cmd
+    "assoc", "break", "call", "cd", "chdir", "cls", "color", "copy", "date", "del", "dir", "echo",
+    "endlocal", "erase", "exit", "for", "ftype", "goto", "if", "md", "mkdir", "mklink", "move",
+    "path", "pause", "popd", "prompt", "pushd", "rd", "rem", "ren", "rename", "rmdir", "set",
+    "setlocal", "shift", "start", "time", "title", "type", "ver", "verify", "vol",
+    // sh
+    "alias", "bg", "command", "eval", "exec", "export", "fg", "hash", "history", "jobs", "kill",
+    "ls", "pwd", "read", "return", "source", "test", "trap", "ulimit", "umask", "unalias",
+    "unset", "wait",
+    // tools
+    "git", "npm", "npx", "node", "yarn", "pnpm", "code", "python", "pip", "docker", "wsl",
+    // this extension's own CLI
+    "pt",
+]);
+
+// Launchers this extension wrote itself are not a conflict: re-creating a deleted command
+// must still work. Real programs can live in the same folder (WindowsApps holds winget and
+// python aliases as .exe), so only the launcher file types count as ours.
+const isOurLauncher = (found, launcherDir) => {
+    if (path.dirname(found).toLowerCase() !== launcherDir.toLowerCase()) return false;
+    return ["", ".cmd", ".vbs"].includes(path.extname(found).toLowerCase());
+};
+
+const findOnPath = (name) => {
+    try {
+        return execFileSync("where", [name], { encoding: "utf8", stdio: ["ignore", "pipe", "ignore"] })
+            .split(/\r?\n/)
+            .map((line) => line.trim())
+            .filter(Boolean);
+    } catch (err) {
+        // `where` exits with 1 when nothing matches
+        return [];
+    }
+};
+
+// Git Bash puts its own tools (yes, head, sort, timeout...) ahead of the Windows PATH, and
+// `where` never sees them since they are not on it. A launcher with one of those names is
+// unreachable from Git Bash and Claude Code, which run the tool instead: `yes` prints y
+// forever. The Git root is found by walking up from git.exe (cmd\, bin\ or mingw64\bin\).
+const gitBashDirs = (lookup) => {
+    const dirs = new Set();
+    for (const git of lookup("git")) {
+        let dir = path.dirname(git);
+        for (let i = 0; i < 3; i++) {
+            if (fs.existsSync(path.join(dir, "usr", "bin"))) {
+                for (const sub of [["usr", "bin"], ["bin"], ["mingw64", "bin"]]) {
+                    dirs.add(path.join(dir, ...sub));
+                }
+                break;
+            }
+            dir = path.dirname(dir);
+        }
+    }
+    return [...dirs];
+};
+
+const findInGitBash = (name, dirs) => {
+    for (const dir of dirs) {
+        for (const file of [name, `${name}.exe`]) {
+            const candidate = path.join(dir, file);
+            try {
+                if (fs.statSync(candidate).isFile()) return candidate;
+            } catch (err) { }
+        }
+    }
+    return null;
+};
+
+// Returns the reason a name cannot be used, or null when it is fine.
+const validateName = (name, { allcommands = [], launcherDir = "", lookup = findOnPath, bashDirs } = {}) => {
+    const value = (name || "").trim();
+    if (!value) return "Command name is empty";
+    if (!NAME_PATTERN.test(value)) {
+        return `"${value}" can only use letters, numbers, emoji, "+", "-" and "_"`;
+    }
+    if (RESERVED.has(value.toLowerCase())) {
+        return `"${value}" is a built-in shell command or a common tool, choose another name`;
+    }
+    // ابدا and ابدأ would reach the same command everywhere names are matched
+    const existing = allcommands.find((command) => nameKey(command.name) === nameKey(value));
+    if (existing) {
+        const saved = String(existing.name);
+        return saved === value ? `"${value}" already exists` : `"${value}" already exists as "${saved}"`;
+    }
+    const clash = lookup(value).find((found) => !isOurLauncher(found, launcherDir));
+    if (clash) {
+        return `"${value}" would hide ${clash}, choose another name`;
+    }
+    const bashTool = findInGitBash(value, bashDirs || gitBashDirs(lookup));
+    if (bashTool) {
+        return `"${value}" is already a Git Bash program (${bashTool}), so Git Bash and Claude Code would run that instead, choose another name`;
+    }
+    return null;
+};
+
+module.exports = {
+    validateName, powershellHint, findOnPath, isOurLauncher
+}

@@ -2,14 +2,24 @@
   "name": "powerterminal",
   "displayName": "Power Terminal",
   "description": "Create your custom Commands and run them with one in Terminal",
-  "version": "1.3.0",
+  "version": "1.6.0",
   "publisher": "sayehxp",
   "author": "sayehxp <sayehxp@gmail.com>",
   "engines": {
-    "vscode": "^1.0.0"
+    "vscode": "^1.48.0",
+    "node": ">=14"
   },
   "main": "./extension.js",
+  "bin": {
+    "pt": "bin/pt.js"
+  },
+  "files": [
+    "bin/",
+    "src/cli.js",
+    "src/utilites/"
+  ],
   "activationEvents": [
+    "onStartupFinished",
     "onCommand:extension.createnew",
     "onCommand:extension.execute",
     "onCommand:extension.catcharg",
@@ -181,7 +191,7 @@
   },
   "icon": "icon.png",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node --test"
   },
   "repository": {
     "type": "git",

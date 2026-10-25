@@ -23,7 +23,7 @@ let RunCommand = vscode.commands.registerCommand(
             vscodeMessageBox(`Command "${commandLine.trim()}" not found`);
             return;
         }
-        openTerminal(applyArgs(match.targetCommand.commands, match.args));
+        openTerminal(applyArgs(match.targetCommand.commands, match.args), match.targetCommand.name);
     }
 );
 

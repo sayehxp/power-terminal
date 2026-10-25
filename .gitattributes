@@ -1,0 +1,2 @@
+# npm runs this on macOS/Linux through its shebang, which breaks on CRLF
+bin/pt.js text eol=lf

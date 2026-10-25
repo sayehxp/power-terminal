@@ -1,7 +1,8 @@
 const vscode = require("vscode");
 const { showInputBox, vscodeMessageBox } = require("../utilites/vscode");
 const { getDB, postDB } = require("../utilites/functions");
-const { deleteVBS } = require("../utilites/vbs");
+const { deleteShim } = require("../utilites/shim");
+const { nameKey } = require("../utilites/arguments");
 
 
 let DeleteCommand = vscode.commands.registerCommand(
@@ -21,13 +22,16 @@ const deleteCommand = async (commandName) => {
         //save
         let jsonDB = await getDB();
         let allcommands = jsonDB.allcommands || [];
-        let isExist = allcommands.find(command => command.name == commandName);
+        // any spelling of the name finds it (ابدا for ابدأ); the launcher goes by the saved one
+        let isExist = allcommands.find(command => nameKey(command.name) === nameKey(commandName));
         if (isExist) {
-            allcommands = allcommands.filter(command => command.name != commandName);
+            allcommands = allcommands.filter(command => command !== isExist);
             jsonDB = { ...jsonDB, allcommands };
             postDB(jsonDB)
-            deleteVBS(commandName);
-            vscodeMessageBox(`${commandName} deleted`)
+            deleteShim(isExist.name);
+            vscodeMessageBox(`${isExist.name} deleted`)
+        } else {
+            vscodeMessageBox(`Command "${commandName}" not found`)
         }
 
 
