@@ -6,3 +6,4 @@ images/**
 package-lock.json
 PLAN.md
 test/**
+.npmignore

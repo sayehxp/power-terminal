@@ -1,0 +1,15 @@
+# npm only ships the pt CLI; the extension itself goes through vsce and .vscodeignore
+.vs/
+.vscode/
+empty/
+images/
+test/
+src/RegisterCommands/
+src/db.json
+extension.js
+icon.png
+CHANGELOG.md
+PLAN.md
+*.vsix
+.gitattributes
+.vscodeignore

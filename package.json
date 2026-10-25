@@ -13,11 +13,6 @@
   "bin": {
     "pt": "bin/pt.js"
   },
-  "files": [
-    "bin/",
-    "src/cli.js",
-    "src/utilites/"
-  ],
   "activationEvents": [
     "onStartupFinished",
     "onCommand:extension.createnew",
