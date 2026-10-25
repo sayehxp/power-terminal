@@ -1,169 +1,111 @@
 # Power Terminal
+**Power Terminal** ⚡ **Your own terminal commands: save once, run anywhere by name**
 
-**Power Terminal** 💪 **Run all your terminal commands with just one command**
+Power Terminal saves your long or repeated commands under short names, so typing `dev`
+launches `npm run dev`. It can also run several commands at once, like typing `startall` to
+start your frontend, backend and database servers together.
 
-****Power Terminal is a simple extension to run multiple different commands easily, or to make a long command in (VSCode) simpler and shorter [Github Here](https://github.com/sayehxp/power-terminal.git)****
 
-> **🖹 For Feedback : [Click Here](https://github.com/sayehxp/power-terminal/issues)**
+# How to use
+  For [IDE](#IDES) (VS Code, Cursor and Antigravity),
 
-**▬ Create your custom command** **⬇️**
-![PowerTerminal](https://raw.githubusercontent.com/sayehxp/power-terminal/main/images/createcommand.gif)
+  For [CLI](#CLI) Claude Code , Codex , Windows Terminal
 
+   
+## 1.Inside IDE 
 
 
 ### Create Command
 * `ctrl + shift + p` , type `Power Terminal: Create Command`
-* Type a command name (without spaces)
-* Write your commands one by one — press Enter on an empty input when you are done
+* Type a name (no spaces)
+* Type your commands one by one, then press Enter on an empty line
 
 ### Run Command
 * `ctrl + shift + p` , type `Power Terminal: Run Command`
-* Type the command name you want to run. Or just write the command name in the Terminal
-* **note** : the "write it in the Terminal" option is available for Win OS only
+* Type the name, plus any [arguments](#passing-arguments)
+
 
 ### Delete Command
 * `ctrl + shift + p` , type `Power Terminal: Delete Command`
-* Type the command name you want to delete
-
-## Passing arguments
-
-The whole line you type is used, not just the command name — anything after the name is passed
-along to your command. This works both in the *Run Command* input box and when you type the
-name straight into the terminal.
-
-So a command named `pull` holding `git pull origin` gives you:
-
-```
-pull main            ->  git pull origin main
-pull dev --rebase    ->  git pull origin dev --rebase
-pull                 ->  git pull origin
-```
-
-Need the arguments somewhere other than the end? Use placeholders when creating the command:
-
-* `$1` .. `$9` — a single argument by position
-* `$*` or `$@` — every argument as typed
-
-```
-saved command : git checkout -b $1 origin/$2
-you type      : co feature/login dev
-runs          : git checkout -b feature/login origin/dev
-```
-
-Without a placeholder the arguments are appended to the **last** entry of the command.
+* Type the name
 
 
-## How commands open in the terminal
+## 2.In CLI (Windows)
+  Saved commands are ordinary programs on your PATH - you can Just type the command name in any terminal, in AI CLIs like **Claude Code**, **Codex**
+  and **Gemini CLI** can use them directly **Using** `!` followed by the name
 
-* A saved command with **multiple entries** opens **one separate terminal per entry**, so they all run side by side
-* A saved command with a **single entry** runs **in your currently active terminal** — no extra terminal is opened (if no terminal is open, one is created for you)
+  ***note*** : Several commands each opens in its own terminal, so IDE must be open
 
-## Good to know
 
-* Your saved commands are kept in one place shared by **VS Code, Cursor, Antigravity** and other VS Code based editors (`%APPDATA%\powerterminal\db.json` on Windows), so a command saved in one editor works in all of them and survives extension updates
-* A launcher for a **multiple entries** command is picked up by whichever of those editors is open
-* Each saved command also gets a keyboard shortcut (`ctrl + shift + alt + <letter>`) assigned automatically in order of creation, for the first 26 commands
+ ### Take Full Control with CLI
 
-## Typing the command name in a terminal (Windows)
-
-Every command you create also gets two small launchers on your PATH, which is what lets you
-type the name in any terminal: `name.cmd` for PowerShell and cmd, and `name` (no extension) for
-Git Bash.
-
-* A **single entry** command runs directly from the shell — PowerShell, cmd, Git Bash, Windows
-  Terminal, any folder. VS Code does not have to be open or focused
-* A **multiple entries** command needs VS Code, since only VS Code can open a terminal per entry.
-  The launcher leaves a request that the running VS Code window picks up. If no window is open,
-  nothing happens and the request is discarded
-
-### Works with AI CLIs
-
-Tools like Claude Code run shell commands through Git Bash, so your saved commands work there
-too: type `! dev` in Claude Code, or ask the agent to run `dev`, and the output comes back to it.
-
-### Creating commands from the terminal: `pt`
-
-The extension also puts a `pt` command on your PATH, so commands can be created and deleted
-from any terminal without opening the command palette:
-
-```
-pt add dev "npm run dev"                    one entry
-pt add stack "npm run api" "npm run web"    one quoted argument per entry
-pt add co "git checkout -b $1 origin/$2"    placeholders work the same way
-pt list                                     list saved commands
-pt remove dev                               delete a command
-```
-
-It saves to the same shared `db.json` and writes the same launchers, so the command is usable
-straight away and shows up in every editor. The same name rules apply.
-
-An AI CLI can use it too: ask Claude Code to *"make a power terminal command called `deploy`
-that builds and pushes"* and it can run `pt add deploy ...` itself.
-
-There are two ways to get `pt`:
-
-* **With the extension**: it is written when VS Code, Cursor or Antigravity starts, and runs on
-  the editor's own executable, so Node does not need to be installed
-* **Without any editor**, from npm (needs Node 14+):
+  if u want to add , remove and delete commands without tocuh ides all works get done by cli u can do that using `pt` commands it installed with extension and u can install it standalone as npm package 
 
   ```
   npm install -g powerterminal
   ```
 
-  Single entry commands work fully without an editor; multiple entries ones still need one
-  open. When both are installed, the npm `pt` is used and the extension leaves it alone.
+  ```
+  pt add <name> <command/s>      save a command
+  pt list                        list saved commands
+  pt remove <name>               delete a command
+  ```
 
-### Command names
+  For example :
 
-The name becomes a program on your PATH, so Power Terminal refuses names that would hide
-something real: shell built-ins (`cd`, `dir`, `set`...), common tools (`git`, `npm`, `node`...), `pt` itself,
-anything already found on PATH, and names that are already saved. Names use letters, numbers,
-emoji, `-` and `_`.
+  ```
+  pt add 📦 "npm install -g"
+  pt add 🗑️ "npm uninstall"
 
-### Arabic and other languages
+  📦 axios cfonts colors    ->  npm install axios,cfonts,colors 
+  🗑️ axios                  ->  npm uninstall axios
+  ```
 
-Names can use letters from any language, so a command can be called `ابدأ` or `رفع_الملفات`,
-and saved commands and arguments can contain Arabic text too:
+  
+  ## Passing arguments
 
-```
-pt ضيف ابدأ "npm start"          pt add, in Arabic (also أضف)
-ابدأ --port 3000                 type it in any terminal
-pt اعرض                          pt list (also قائمة)
-pt امسح ابدأ                     pt remove (also احذف)
-```
+  Add arguments after the name, just like a normal command. To place them anywhere in your
+  command, use placeholders when you create it:
 
-One Arabic word is often typed several ways, so `ابدأ`, `ابدا` and `إبدأ`, with or without
-tashkeel, count as the same name: saving a second spelling is refused, and *Run Command*,
-*Delete Command* and `pt remove` accept any of them. In the terminal itself, type the name as
-it was saved, since the shell looks for that exact file.
+  * `$1` .. `$9` — one argument, by position
+  * `$*` or `$@` — all arguments, as typed
 
-The `.cmd` launchers switch the console to UTF-8 while a command with Arabic runs and put
-the old code page back afterwards, so Arabic reaches the program intact in cmd and
-PowerShell.
+  ```
+  saved command : npm install $1 --save-dev
+  you type      : need typescript
+  runs          : npm install typescript --save-dev
+  
+  ```
+  
 
-### Emoji
+  No placeholders? The arguments are simply added to the end:
 
-Emoji work as names too, alone or mixed with letters, and inside commands and arguments:
+  ```
+  saved command : git pull origin
+  you type      : pull main
+  runs          : git pull origin main
+  ```
 
-```
-pt add 🚀 "npm run deploy"
-🚀 --prod                        type it in any terminal
-pt add deploy🔥 "npm run build && npm run deploy"
-```
+  ## Why Power Terminal
 
-Skin tones (`👍🏽`), joined emoji (`👨‍💻`), flags (`🇪🇬`) and keycaps (`1️⃣`) are all fine.
-An emoji typed with or without its variation selector (`❤` / `❤️`) counts as the same name in
-*Run Command*, *Delete Command* and `pt remove`; in the terminal, type it the way it was saved.
-The old Windows console (conhost) may not let you type or show emoji, but the command still
-runs. Windows Terminal, the VS Code terminal and Git Bash show them properly.
+  **Save once, use everywhere.** Create a command in one place, from any IDE (vscode,agy,cursor ..etc ) or even with `pt`, and
+  run it in any terminal, or in an AI CLI. 
+  
 
-### `%` in saved commands
+  **Still useful with AI.** Asking an AI to run your commands is bit
+  slower. AI agents can call your powerterminal commands too.
 
-The `.cmd` launcher runs your command through cmd, so `%PATH%` and other variables expand as
-usual; write `%%` for a literal `%`. The Git Bash launcher runs the same command through sh, so a
-command written in cmd syntax may not work there. Tools like `npm`, `git` and `node` work in both.
+  **Name it your way.** Use English, Arabic (`ابدأ`) or emoji (`🚀`). Names that would hide a real program, like `git` or `cd`, are refused.
 
-Launchers made by versions before 1.4.0 worked by pressing a keyboard shortcut at whatever window
-had focus, which typed stray characters into the prompt when VS Code was not focused or a
-different keyboard layout was active. Those are replaced automatically the first time 1.4.0
-starts.
+  **A saved prompt, everywhere.** A command can also hold a prompt you reuse, like
+  `claude -p "review my staged changes"`. A skill belongs to one tool; a saved command works in
+  every folder and every terminal.
+
+
+  ### Upgrading from before 1.4.0
+
+  Launchers made by versions before 1.4.0 worked by pressing a keyboard shortcut at whatever window
+  had focus, which typed stray characters into the prompt when VS Code was not focused or a
+  different keyboard layout was active. Those are replaced automatically the first time 1.4.0
+  starts.
+  

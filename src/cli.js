@@ -5,22 +5,15 @@
 const fs = require("fs");
 const path = require("path");
 const { sharedDir, readJSON, writeJSON } = require("./utilites/storage");
-const { validateName } = require("./utilites/names");
+const { validateName, powershellHint } = require("./utilites/names");
 const { createShim, deleteShim, launcherDir } = require("./utilites/shim");
 const { nameKey } = require("./utilites/arguments");
 
 const USAGE = [
     `usage:`,
-    `  pt add <name> <command> [command...]   save a command, one quoted argument per entry`,
-    `  pt remove <name>                       delete a command`,
-    `  pt list                                list saved commands`,
-    ``,
-    `examples:`,
-    `  pt add dev "npm run dev"`,
-    `  pt add stack "npm run api" "npm run web"`,
-    `  pt add co "git checkout -b $1 origin/$2"`,
-    ``,
-    `in Arabic: pt ضيف / أضف, pt امسح / احذف, pt اعرض / قائمة`,
+    `  pt add <name> <command/s>    save a command, one quoted argument per entry`,
+    `  pt remove <name>             delete a command`,
+    `  pt list                      list saved commands`,
 ].join("\n");
 
 const defaults = () => ({
@@ -58,6 +51,8 @@ const add = ([name, ...entries], { dbFile, dir, validate, create }) => {
     create(command);
 
     const lines = [`${commandName} saved`];
+    const hint = powershellHint(commandName);
+    if (hint) lines.push(hint);
     if (commands.length > 1) {
         lines.push(`it opens one terminal per entry, so it only runs while VS Code, Cursor or Antigravity is open`);
     }

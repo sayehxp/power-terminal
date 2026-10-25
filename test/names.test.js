@@ -1,6 +1,6 @@
 const test = require("node:test");
 const assert = require("node:assert");
-const { validateName } = require("../src/utilites/names");
+const { validateName, powershellHint } = require("../src/utilites/names");
 
 const launcherDir = "C:\\Users\\me\\AppData\\Local\\Microsoft\\WindowsApps";
 const nothingOnPath = () => [];
@@ -10,8 +10,23 @@ test("accepts a plain name", () => {
 });
 
 test("rejects empty names, spaces and shell characters", () => {
-    for (const name of ["", "   ", "my dev", "a&b", "-x", "dev.cmd", "ابدأ الآن", "ابدأ!", "_ابدأ"]) {
+    for (const name of ["", "   ", "my dev", "a&b", "a@b", "x=", "(x)", "dev.cmd", "ابدأ الآن", "ابدأ!"]) {
         assert.ok(validateName(name, { launcherDir, lookup: nothingOnPath }), name);
+    }
+});
+
+test("accepts +, - and _ anywhere, alone or mixed", () => {
+    for (const name of ["+", "-", "++", "c++", "+x", "x+", "-x", "_x", "+🚀", "ابدأ+", "+-"]) {
+        assert.strictEqual(validateName(name, { launcherDir, lookup: nothingOnPath }), null, name);
+    }
+});
+
+test("powershellHint: only names PowerShell reads as math need &", () => {
+    for (const name of ["+", "++", "+x", "-", "--", "-1", "-🚀", "-ابدأ", "1+", "12-x"]) {
+        assert.strictEqual(powershellHint(name), `in PowerShell, run it as: & '${name}'`, name);
+    }
+    for (const name of ["dev", "c++", "x+", "-x", "-dev", "1a+", "🚀+", "ابدأ+", "_x"]) {
+        assert.strictEqual(powershellHint(name), null, name);
     }
 });
 
