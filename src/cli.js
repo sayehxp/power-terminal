@@ -11,16 +11,9 @@ const { nameKey } = require("./utilites/arguments");
 
 const USAGE = [
     `usage:`,
-    `  pt add <name> <command> [command...]   save a command, one quoted argument per entry`,
-    `  pt remove <name>                       delete a command`,
-    `  pt list                                list saved commands`,
-    ``,
-    `examples:`,
-    `  pt add dev "npm run dev"`,
-    `  pt add stack "npm run api" "npm run web"`,
-    `  pt add co "git checkout -b $1 origin/$2"`,
-    ``,
-    `in Arabic: pt ضيف / أضف, pt امسح / احذف, pt اعرض / قائمة`,
+    `  pt add <name> <command/s>    save a command, one quoted argument per entry`,
+    `  pt remove <name>             delete a command`,
+    `  pt list                      list saved commands`,
 ].join("\n");
 
 const defaults = () => ({
