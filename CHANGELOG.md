@@ -1,3 +1,8 @@
+## Unreleased
+
+- **Commands with several entries work without an editor**: typed in any terminal, or with `!` in Claude Code, Codex or Gemini CLI, all the entries run at once right in that terminal, like `concurrently`: each output line is tagged `[1]`, `[2]`..., each entry reports its exit code, and Ctrl+C stops them all (press it twice to force-kill anything that ignores it). Arguments are applied as usual. When VS Code, Cursor or Antigravity is open, each entry still gets its own terminal there. The launcher waits about a second for an editor to answer before running the entries itself
+- `pt add` says where a multi-entry command runs instead of saying it needs an editor
+
 ## 1.7.0
 
 - **Arabic command names**: names can use letters from any language — `ابدأ`, `رفع_الملفات` — and type straight into any terminal

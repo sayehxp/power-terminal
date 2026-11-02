@@ -35,7 +35,14 @@ start your frontend, backend and database servers together.
   Saved commands are ordinary programs on your PATH - you can Just type the command name in any terminal, in AI CLIs like **Claude Code**, **Codex**
   and **Gemini CLI** can use them directly **Using** `!` followed by the name
 
-  ***note*** : Several commands each opens in its own terminal, so IDE must be open
+  ***note*** : A command with several entries runs them all at once. When VS Code, Cursor or
+  Antigravity is open, each entry gets its own terminal there. Otherwise they run together right in
+  the terminal you typed the name in, each output line tagged `[1]`, `[2]`..., and Ctrl+C stops them
+  all. No IDE needed.
+
+  ```
+  pt add mktb "cd /d C:\MKTB\MKTB-Backend && npm run dev" "cd /d C:\MKTB\MKTB-Frontend && npm run dev"
+  ```
 
 
  ### Take Full Control with CLI

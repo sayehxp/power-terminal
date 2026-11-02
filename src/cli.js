@@ -7,7 +7,9 @@ const path = require("path");
 const { sharedDir, readJSON, writeJSON } = require("./utilites/storage");
 const { validateName, powershellHint } = require("./utilites/names");
 const { createShim, deleteShim, launcherDir } = require("./utilites/shim");
-const { nameKey } = require("./utilites/arguments");
+const { runTogether } = require("./utilites/together");
+const { nameKey, matchCommandLine, applyArgs } = require("./utilites/arguments");
+const { reclaimRequest } = require("./utilites/requests");
 
 const USAGE = [
     `usage:`,
@@ -22,6 +24,8 @@ const defaults = () => ({
     validate: validateName,
     create: createShim,
     remove: deleteShim,
+    take: reclaimRequest,
+    together: runTogether,
 });
 
 const load = (dbFile) => readJSON(dbFile) || { allcommands: [] };
@@ -54,7 +58,7 @@ const add = ([name, ...entries], { dbFile, dir, validate, create }) => {
     const hint = powershellHint(commandName);
     if (hint) lines.push(hint);
     if (commands.length > 1) {
-        lines.push(`it opens one terminal per entry, so it only runs while VS Code, Cursor or Antigravity is open`);
+        lines.push(`with VS Code, Cursor or Antigravity open, each entry gets a terminal there; otherwise they run together in the terminal you type it in`);
     }
     return { code: 0, out: lines.join("\n") };
 };
@@ -88,6 +92,21 @@ const list = ({ dbFile }) => {
     return { code: 0, out: lines.join("\n") };
 };
 
+// Not for people: a multi-entry launcher calls this with the request it just left. When an open
+// editor took the request, the editor opens the terminals and there is nothing to do. Otherwise
+// the launcher was typed with no editor around, so all the entries run together right here.
+// That keeps going after this returns: `pending` settles with their exit code.
+const request = ([file], { dbFile, take, together }) => {
+    const line = file ? take(file) : null;
+    if (!line) return { code: 0, out: "" };
+
+    const match = matchCommandLine(load(dbFile).allcommands || [], line);
+    if (!match) return { code: 1, out: `Command "${line.split(/\s+/)[0]}" not found` };
+
+    const { name, commands } = match.targetCommand;
+    return { code: 0, out: "", pending: together(String(name), applyArgs(commands, match.args)) };
+};
+
 // Returns what to print and the exit code instead of printing, so the tests can check both.
 // Actions can be typed in Arabic too, folded like names so أضف and اضف are the same.
 const run = (argv, options = {}) => {
@@ -110,6 +129,8 @@ const run = (argv, options = {}) => {
         case "اعرض":
         case "قائمه":
             return list(deps);
+        case "__request":
+            return request(rest, deps);
         case "":
         case "help":
         case "مساعده":

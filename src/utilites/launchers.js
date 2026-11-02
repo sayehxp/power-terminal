@@ -92,12 +92,14 @@ const cmdDirectScript = (command) => {
     ].join("\r\n");
 };
 
-// Several commands mean one new terminal each, which only VS Code can do. The launcher leaves
-// a request behind and the extension picks it up; no focus, no keystrokes, no keyboard layout.
+// Several commands mean one new terminal each. The launcher leaves a request behind and an open
+// editor picks it up; no focus, no keystrokes, no keyboard layout. Then `pt __request` waits a
+// moment, and when no editor took the request, it runs all the entries together right in this
+// terminal, so the command works in any terminal or AI CLI with no editor running.
 // Writing to .tmp and moving into place keeps the watcher from reading a half-written file.
 // The arguments are stored while delayed expansion is off and printed with it on, so `&`, `|`,
 // `>` and `!` inside them are written as text instead of being run. The typed arguments are
-// unknown ahead of time, so this one always writes in UTF-8.
+// unknown ahead of time, so this one always writes in UTF-8. `pt` is itself a .cmd, so `call`.
 const cmdRequestScript = (commandName, dir) => [
     `@echo off`,
     `setlocal DisableDelayedExpansion`,
@@ -110,6 +112,7 @@ const cmdRequestScript = (commandName, dir) => [
     `> "!PT_REQ!.tmp" (echo(${commandName}& echo(!PT_ARGS!)`,
     `move /y "!PT_REQ!.tmp" "!PT_REQ!" >nul`,
     `chcp !PT_CP! >nul`,
+    `call pt __request "!PT_REQ!"`,
     ``,
 ].join("\r\n");
 
@@ -125,9 +128,9 @@ const shRequestScript = (commandName, dir) => [
     `mkdir -p "$dir"`,
     `req="$dir/$$-$(date +%s%N).req"`,
     `printf '%s\\n%s\\n' ${shQuote(commandName)} "$*" > "$req.tmp" && mv -f "$req.tmp" "$req"`,
+    `exec pt __request "$req"`,
     ``,
 ].join("\n");
-
 // `cmd` serves cmd and PowerShell, `sh` serves Git Bash and anything that shells out through it,
 // like `! name` in Claude Code.
 const launcherScripts = (command, dir) => {
