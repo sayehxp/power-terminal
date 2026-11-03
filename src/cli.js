@@ -57,9 +57,6 @@ const add = ([name, ...entries], { dbFile, dir, validate, create }) => {
     const lines = [`${commandName} saved`];
     const hint = powershellHint(commandName);
     if (hint) lines.push(hint);
-    if (commands.length > 1) {
-        lines.push(`with VS Code, Cursor or Antigravity open, each entry gets a terminal there; otherwise they run together in the terminal you type it in`);
-    }
     return { code: 0, out: lines.join("\n") };
 };
 

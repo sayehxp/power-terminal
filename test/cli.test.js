@@ -40,8 +40,7 @@ test("add: saves the command and writes its launchers", () => {
 test("add: one argument per entry, and the first command gets id 65", () => {
     const { dbFile, options } = setup();
     const result = run(["add", "stack", "npm run api", "  ", "npm run web"], options);
-    assert.strictEqual(result.code, 0);
-    assert.match(result.out, /otherwise they run together/);
+    assert.deepStrictEqual(result, { code: 0, out: "stack saved" });
     assert.deepStrictEqual(readJSON(dbFile).allcommands, [
         { id: 65, name: "stack", commands: ["npm run api", "npm run web"] },
     ]);
