@@ -31,10 +31,14 @@ const useSharedStorage = () => {
     return dir;
 };
 
-// Every open window of every editor watches the same directory, so both see the file. The rename is atomic:
-// whoever wins gets the request, the loser gets ENOENT and does nothing.
-const claim = (name) => {
-    const source = path.join(dir, name);
+// How long a launcher gives the editors to pick its request up. fs.watch reports a new file
+// within milliseconds, so if nobody has taken it after a second, no editor is open.
+const WAIT_MS = 1000;
+
+// Every open window of every editor watches the same directory, and the launcher comes back
+// for its own request too. The rename is atomic: whoever wins gets the request, the others
+// get ENOENT and do nothing.
+const claim = (source) => {
     const claimed = `${source}.taken`;
     try {
         const stat = fs.statSync(source);
@@ -45,10 +49,11 @@ const claim = (name) => {
     }
 };
 
-// First line is the command name, second line is whatever was typed after it.
-const runRequest = async (name) => {
-    const taken = claim(name);
-    if (!taken) return;
+// First line is the command name, second line is whatever was typed after it. Returns both
+// as one typed line, or null when someone else got there first or the request is stale.
+const takeRequest = (source) => {
+    const taken = claim(source);
+    if (!taken) return null;
 
     let line = "";
     try {
@@ -61,7 +66,25 @@ const runRequest = async (name) => {
         fs.unlinkSync(taken.claimed);
     } catch (err) { }
 
-    if (!taken.fresh || !line) return;
+    return taken.fresh && line ? line : null;
+};
+
+// Run by the launcher (through `pt __request`) right after it leaves the request. The editors
+// get until the request is `waitMs` old; if none of them took it, it is taken back so the
+// caller can open the terminals itself. The CLI has nothing else to do, so it just blocks.
+const reclaimRequest = (file, waitMs = WAIT_MS) => {
+    try {
+        const left = waitMs - (Date.now() - fs.statSync(file).mtimeMs);
+        if (left > 0) Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, left);
+    } catch (err) {
+        return null;
+    }
+    return takeRequest(file);
+};
+
+const runRequest = async (name) => {
+    const line = takeRequest(path.join(dir, name));
+    if (!line) return;
 
     // required here, not at the top: functions.js needs VS Code, and the `pt` CLI loads this
     // file (through shim.js) outside of it
@@ -101,5 +124,5 @@ const watchRequests = () => {
 };
 
 module.exports = {
-    requestsDir, useSharedStorage, watchRequests
+    requestsDir, useSharedStorage, watchRequests, reclaimRequest
 }

@@ -35,7 +35,20 @@ start your frontend, backend and database servers together.
   Saved commands are ordinary programs on your PATH - you can Just type the command name in any terminal, in AI CLIs like **Claude Code**, **Codex**
   and **Gemini CLI** can use them directly **Using** `!` followed by the name
 
-  ***note*** : Several commands each opens in its own terminal, so IDE must be open
+  ***note*** : A command with several entries runs them all at once. When VS Code, Cursor or
+  Antigravity is open, each entry gets its own terminal there. Otherwise they run together right in
+  the terminal you typed the name in, each output line tagged `[1]`, `[2]`..., and Ctrl+C stops them
+  all. No IDE needed.
+
+  For example, one `stack` command that starts a backend and a frontend together:
+
+  ```
+  pt add stack "cd /d C:\projects\my-app\backend && npm run dev" "cd /d C:\projects\my-app\frontend && npm run dev"
+  ```
+
+  Then type `stack` in any terminal. Each entry moves into its folder and starts its dev server.
+  `&&` runs `npm run dev` only if the `cd` worked. `/d` lets `cd` switch drives too, so the
+  command works even when the terminal is on another drive, like `D:`.
 
 
  ### Take Full Control with CLI

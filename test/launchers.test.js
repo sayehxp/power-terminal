@@ -26,6 +26,20 @@ const readRequest = (dir) => {
     return fs.readFileSync(path.join(dir, files[0]), "utf8").split(/\r?\n/).slice(0, 2);
 };
 
+// Request launchers end by handing the request to `pt`. A stub put first on PATH stands in for
+// it and records what it got, so the request stays on disk for the test to read and no real
+// `pt` opens windows. Returns the env to run the launcher with.
+const stubPt = (dir) => {
+    const bin = path.join(dir, "bin");
+    fs.mkdirSync(bin);
+    fs.writeFileSync(path.join(bin, "pt.cmd"), `@echo off\r\n> "%~dp0called.txt" echo(%*\r\n`);
+    fs.writeFileSync(path.join(bin, "pt"), `#!/bin/sh\nprintf '%s\\n' "$*" > "$(dirname "$0")/called.txt"\n`);
+    return {
+        env: { ...process.env, PATH: `${bin}${path.delimiter}${process.env.PATH}` },
+        called: () => fs.readFileSync(path.join(bin, "called.txt"), "utf8").trim(),
+    };
+};
+
 test("cmd: arguments are appended, or fill the placeholders", () => {
     assert.strictEqual(cmdWithArgs("npm run dev"), "npm run dev %*");
     assert.strictEqual(cmdWithArgs("git checkout -b $1 origin/$2"), "git checkout -b %1 origin/%2");
@@ -89,22 +103,35 @@ test("cmd direct launcher returns from a .cmd in the middle of a chain", { skip:
 
 test("cmd request launcher writes the arguments as text", { skip: !isWindows }, () => {
     const dir = tempDir();
-    const file = path.join(dir, "pt.cmd");
-    fs.writeFileSync(file, launcherScripts({ name: "pt", commands: ["a", "b"] }, dir).cmd);
+    const { env } = stubPt(dir);
+    const file = path.join(dir, "multi.cmd");
+    fs.writeFileSync(file, launcherScripts({ name: "multi", commands: ["a", "b"] }, dir).cmd);
 
     // nothing in here may run: `&` would start `whoami`, `>` would create a file, `!` used to vanish
-    execSync(`"${file}" "x & whoami" "1 > out.txt" wow!`, { cwd: dir });
-    assert.deepStrictEqual(readRequest(dir), ["pt", `"x & whoami" "1 > out.txt" wow!`]);
+    execSync(`"${file}" "x & whoami" "1 > out.txt" wow!`, { cwd: dir, env });
+    assert.deepStrictEqual(readRequest(dir), ["multi", `"x & whoami" "1 > out.txt" wow!`]);
     assert.ok(!fs.existsSync(path.join(dir, "out.txt")));
 });
 
 test("cmd request launcher handles no arguments", { skip: !isWindows }, () => {
     const dir = tempDir();
-    const file = path.join(dir, "pt.cmd");
-    fs.writeFileSync(file, launcherScripts({ name: "pt", commands: ["a", "b"] }, dir).cmd);
+    const { env } = stubPt(dir);
+    const file = path.join(dir, "multi.cmd");
+    fs.writeFileSync(file, launcherScripts({ name: "multi", commands: ["a", "b"] }, dir).cmd);
 
-    execSync(`"${file}"`);
-    assert.deepStrictEqual(readRequest(dir), ["pt", ""]);
+    execSync(`"${file}"`, { env });
+    assert.deepStrictEqual(readRequest(dir), ["multi", ""]);
+});
+
+test("cmd request launcher hands its request to pt", { skip: !isWindows }, () => {
+    const dir = tempDir();
+    const { env, called } = stubPt(dir);
+    const file = path.join(dir, "multi.cmd");
+    fs.writeFileSync(file, launcherScripts({ name: "multi", commands: ["a", "b"] }, dir).cmd);
+
+    execSync(`"${file}" x`, { env });
+    const req = fs.readdirSync(dir).find((name) => name.endsWith(".req"));
+    assert.strictEqual(called(), `__request "${path.join(dir, req)}"`);
 });
 
 test("sh direct launcher keeps each argument whole", { skip: !hasSh }, () => {
@@ -115,13 +142,16 @@ test("sh direct launcher keeps each argument whole", { skip: !hasSh }, () => {
     assert.strictEqual(execFileSync("sh", [file, "a b", "c"], { encoding: "utf8" }), "a b|c|");
 });
 
-test("sh request launcher writes the name and the arguments", { skip: !hasSh }, () => {
+test("sh request launcher writes the name and the arguments, then hands it to pt", { skip: !hasSh }, () => {
     const dir = tempDir();
-    const file = path.join(dir, "pt");
-    fs.writeFileSync(file, launcherScripts({ name: "pt", commands: ["a", "b"] }, dir).sh);
+    const { env, called } = stubPt(dir);
+    const file = path.join(dir, "multi");
+    fs.writeFileSync(file, launcherScripts({ name: "multi", commands: ["a", "b"] }, dir).sh);
 
-    execFileSync("sh", [file, "x & y", "$HOME"]);
-    assert.deepStrictEqual(readRequest(dir), ["pt", "x & y $HOME"]);
+    execFileSync("sh", [file, "x & y", "$HOME"], { env });
+    assert.deepStrictEqual(readRequest(dir), ["multi", "x & y $HOME"]);
+    const req = fs.readdirSync(dir).find((name) => name.endsWith(".req"));
+    assert.strictEqual(called(), `__request ${dir.replace(/\\/g, "/")}/${req}`);
 });
 
 test("cmd: ASCII launchers stay one line, others switch to UTF-8 and back", () => {
@@ -144,7 +174,7 @@ test("cmd: emoji in the command, the name and the arguments arrive intact", { sk
 
     const request = path.join(dir, "request.cmd");
     fs.writeFileSync(request, launcherScripts({ name: "🔥", commands: ["a", "b"] }, dir).cmd);
-    execSync(`"${request}" 🍕`);
+    execSync(`"${request}" 🍕`, { env: stubPt(dir).env });
     assert.deepStrictEqual(readRequest(dir), ["🔥", "🍕"]);
 });
 
@@ -160,7 +190,7 @@ test("cmd: Arabic in the command, the name and the arguments arrives intact", { 
 
     const request = path.join(dir, "request.cmd");
     fs.writeFileSync(request, launcherScripts({ name: "ابدأ", commands: ["a", "b"] }, dir).cmd);
-    execSync(`"${request}" سلام`);
+    execSync(`"${request}" سلام`, { env: stubPt(dir).env });
     assert.deepStrictEqual(readRequest(dir), ["ابدأ", "سلام"]);
 
     // the console is left on the code page it had

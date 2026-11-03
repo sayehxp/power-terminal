@@ -40,8 +40,7 @@ test("add: saves the command and writes its launchers", () => {
 test("add: one argument per entry, and the first command gets id 65", () => {
     const { dbFile, options } = setup();
     const result = run(["add", "stack", "npm run api", "  ", "npm run web"], options);
-    assert.strictEqual(result.code, 0);
-    assert.match(result.out, /only runs while VS Code/);
+    assert.deepStrictEqual(result, { code: 0, out: "stack saved" });
     assert.deepStrictEqual(readJSON(dbFile).allcommands, [
         { id: 65, name: "stack", commands: ["npm run api", "npm run web"] },
     ]);
@@ -167,4 +166,52 @@ test("arabic: pt ضيف / امسح / اعرض, and any spelling deletes", () => 
     assert.deepStrictEqual(removed, ["ابدأ"]);
     assert.deepStrictEqual(run(["احذف", "شغل"], options).code, 0);
     assert.deepStrictEqual(readJSON(dbFile).allcommands, []);
+});
+
+// `pt __request` is what a multi-entry launcher runs after leaving its request.
+const requestSetup = (allcommands, line) => {
+    const { options } = setup(allcommands);
+    const opened = [];
+    const together = (title, entries) => {
+        opened.push([title, entries]);
+        return Promise.resolve(3);
+    };
+    return { opened, options: { ...options, take: () => line, together } };
+};
+
+test("__request: no editor took it, so the entries run together here, arguments applied", async () => {
+    const { opened, options } = requestSetup(
+        [{ id: 65, name: "stack", commands: ["npm run api", "npm run web"] }],
+        "STACK --port 3000"
+    );
+    const { pending, ...result } = run(["__request", "x.req"], options);
+    assert.deepStrictEqual(result, { code: 0, out: "" });
+    assert.deepStrictEqual(opened, [["stack", ["npm run api", "npm run web --port 3000"]]]);
+    assert.strictEqual(await pending, 3, "pt exits with the entries' code");
+});
+
+test("__request: an editor took it, so nothing opens and nothing is printed", () => {
+    const { opened, options } = requestSetup([{ id: 65, name: "stack", commands: ["a", "b"] }], null);
+    assert.deepStrictEqual(run(["__request", "x.req"], options), { code: 0, out: "" });
+    assert.deepStrictEqual(opened, []);
+});
+
+test("__request: a command deleted since says so", () => {
+    const { opened, options } = requestSetup([], "gone now");
+    assert.deepStrictEqual(run(["__request", "x.req"], options), { code: 1, out: `Command "gone" not found` });
+    assert.deepStrictEqual(opened, []);
+});
+
+test("reclaim: an untaken request is taken back after the wait, a taken one is left alone", () => {
+    const { reclaimRequest } = require("../src/utilites/requests");
+    const file = path.join(tempDir(), "1.req");
+    fs.writeFileSync(file, "stack\n--port 3000\n");
+
+    const started = Date.now();
+    assert.strictEqual(reclaimRequest(file, 300), "stack --port 3000");
+    assert.ok(Date.now() - started >= 250, "it waits for the editors first");
+    assert.ok(!fs.existsSync(file) && !fs.existsSync(`${file}.taken`));
+
+    // gone already: an editor renamed it first
+    assert.strictEqual(reclaimRequest(file, 0), null);
 });
